@@ -96,24 +96,26 @@ class Loader
 
     public function resolvePath($template, $from = '')
     {
-        $source = implode('/', $this->normalizePath($this->options['source']));
+        foreach($this->options['source'] as $sourcePath) {
+            $source = implode('/', $this->normalizePath($sourcePath));
 
-        $parts = $this->normalizePath(
-            $source . '/' . dirname($from) . '/' . $template
-        );
+            $parts = $this->normalizePath(
+                $source . '/' . dirname($from) . '/' . $template
+            );
 
-        foreach ($this->normalizePath($source) as $i => $part) {
-            if ($part !== $parts[$i]) {
-                throw new \RuntimeException(sprintf(
-                    '%s is outside the source directory',
-                    $template
-                ));
+            foreach ($this->normalizePath($source) as $i => $part) {
+                if ($part !== $parts[$i]) {
+                    throw new \RuntimeException(sprintf(
+                        '%s is outside the source directory',
+                        $template
+                    ));
+                }
             }
+
+            $path = trim(substr(implode('/', $parts), strlen($source)), '/');
+
+            return $path;
         }
-
-        $path = trim(substr(implode('/', $parts), strlen($source)), '/');
-
-        return $path;
     }
 
     public function compile($template, $mode = null)
@@ -170,6 +172,14 @@ class Loader
         return $this;
     }
 
+    /**
+     * @param $template
+     * @param string $from
+     * @return Template
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     * @throws \Exception
+     */
     public function load($template, $from = '')
     {
         if ($template instanceof Template) {

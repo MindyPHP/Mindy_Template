@@ -10,27 +10,54 @@ class FileAdapter implements Adapter
 
     public function __construct($source)
     {
-        if (!($this->source = realpath($source)) || !is_dir($this->source)) {
-            throw new \RuntimeException(sprintf(
-                'source directory %s not found',
-                $source
-            ));
+        if(!is_array($source)) {
+            $path = realpath($source);
+            if(!$path) {
+                throw new \RuntimeException(sprintf('source directory %s not found', $source));
+            }
+            $paths = array($path);
+        } else {
+            $paths = array();
+            foreach($source as $path) {
+                if($absPath = realpath($path)) {
+                    $paths[] = $absPath;
+                } else {
+                    throw new \RuntimeException(sprintf('source directory %s not found', $source));
+                }
+            }
         }
+        $this->source = $paths;
     }
 
     public function isReadable($path)
     {
-        return is_readable($this->source. '/' . $path);
+        foreach($this->source as $source) {
+            if(is_readable($source. '/' . $path)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function lastModified($path)
     {
-        return filemtime($this->source. '/' . $path);
+        foreach($this->source as $source) {
+            if(is_file($source . '/' . $path)) {
+                return filemtime($source . '/' . $path);
+            }
+        }
+        return null;
     }
 
     public function getContents($path)
     {
-        return file_get_contents($this->source . '/' . $path);
+        foreach($this->source as $source) {
+            if(is_file($source . '/' . $path)) {
+                return file_get_contents($source . '/' . $path);
+            }
+        }
+        return null;
     }
 }
 
