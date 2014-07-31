@@ -2,6 +2,8 @@
 
 namespace Flow;
 
+use Flow\Expression\FilterExpression;
+
 class Parser
 {
     protected $stream;

@@ -21,7 +21,7 @@ class Loader
         if ($autoload) return;
 
         ini_set('unserialize_callback_func', 'spl_autoload_call');
-        spl_autoload_register(function($class) {
+        spl_autoload_register(function ($class) {
             $class = explode('\\', $class);
             array_shift($class);
             $path = __DIR__ . '/' . implode('/', $class) . '.php';
@@ -44,8 +44,8 @@ class Loader
         }
 
         $options += array(
-            'mode'    => self::RECOMPILE_NORMAL,
-            'mkdir'   => 0777,
+            'mode' => self::RECOMPILE_NORMAL,
+            'mkdir' => 0777,
             'helpers' => array(),
         );
 
@@ -69,9 +69,9 @@ class Loader
         }
 
         $this->options = array(
-            'source'  => $options['source'],
-            'target'  => $target,
-            'mode'    => $options['mode'],
+            'source' => $options['source'],
+            'target' => $target,
+            'mode' => $options['mode'],
             'adapter' => $options['adapter'],
             'helpers' => $options['helpers'],
         );
@@ -122,7 +122,7 @@ class Loader
             throw new \InvalidArgumentException('string expected');
         }
 
-        $source  = $this->options['source'];
+        $source = $this->options['source'];
         $adapter = $this->options['adapter'];
 
         $path = $this->resolvePath($template);
@@ -143,23 +143,23 @@ class Loader
         }
 
         switch ($mode) {
-        case self::RECOMPILE_ALWAYS:
-            $compile = true;
-            break;
-        case self::RECOMPILE_NEVER:
-            $compile = !file_exists($target);
-            break;
-        case self::RECOMPILE_NORMAL:
-        default:
-            $compile = !file_exists($target) ||
-                filemtime($target) < $adapter->lastModified($path);
-            break;
+            case self::RECOMPILE_ALWAYS:
+                $compile = true;
+                break;
+            case self::RECOMPILE_NEVER:
+                $compile = !file_exists($target);
+                break;
+            case self::RECOMPILE_NORMAL:
+            default:
+                $compile = !file_exists($target) ||
+                    filemtime($target) < $adapter->lastModified($path);
+                break;
         }
 
         if ($compile) {
             try {
-                $lexer    = new Lexer($adapter->getContents($path));
-                $parser   = new Parser($lexer->tokenize());
+                $lexer = new Lexer($adapter->getContents($path));
+                $parser = new Parser($lexer->tokenize());
                 $compiler = new Compiler($parser->parse());
                 $compiler->compile($path, $target);
             } catch (SyntaxError $e) {
@@ -180,7 +180,7 @@ class Loader
             throw new \InvalidArgumentException('string expected');
         }
 
-        $source  = $this->options['source'];
+        $source = $this->options['source'];
         $adapter = $this->options['adapter'];
 
         if (isset($this->paths[$template . $from])) {
@@ -208,23 +208,23 @@ class Loader
             $target = $this->options['target'] . '/' . $class . '.php';
 
             switch ($this->options['mode']) {
-            case self::RECOMPILE_ALWAYS:
-                $compile = true;
-                break;
-            case self::RECOMPILE_NEVER:
-                $compile = !file_exists($target);
-                break;
-            case self::RECOMPILE_NORMAL:
-            default:
-                $compile = !file_exists($target) ||
-                    filemtime($target) < $adapter->lastModified($path);
-                break;
+                case self::RECOMPILE_ALWAYS:
+                    $compile = true;
+                    break;
+                case self::RECOMPILE_NEVER:
+                    $compile = !file_exists($target);
+                    break;
+                case self::RECOMPILE_NORMAL:
+                default:
+                    $compile = !file_exists($target) ||
+                        filemtime($target) < $adapter->lastModified($path);
+                    break;
             }
 
             if ($compile) {
                 try {
-                    $lexer    = new Lexer($adapter->getContents($path));
-                    $parser   = new Parser($lexer->tokenize());
+                    $lexer = new Lexer($adapter->getContents($path));
+                    $parser = new Parser($lexer->tokenize());
                     $compiler = new Compiler($parser->parse());
                     $compiler->compile($path, $target);
                 } catch (SyntaxError $e) {
@@ -239,13 +239,43 @@ class Loader
         return $this->cache[$class];
     }
 
+    public function loadFromString($template)
+    {
+        if (!is_string($template)) {
+            throw new \InvalidArgumentException('string expected');
+        }
+
+        $class = self::CLASS_PREFIX . md5($template);
+
+        if (isset($this->cache[$class])) {
+            return $this->cache[$class];
+        }
+
+        $target = $this->options['target'] . '/' . $class . '.php';
+        $path = "";
+
+        try {
+            $lexer = new Lexer($template);
+            $parser = new Parser($lexer->tokenize());
+            $compiler = new Compiler($parser->parse());
+            $compiler->compile($template, $target);
+        } catch (SyntaxError $e) {
+            throw $e->setMessage($path . ': ' . $e->getMessage());
+        }
+        require_once $target;
+
+        $this->cache[$class] = new $class($this, $this->options['helpers']);
+
+        return $this->cache[$class];
+    }
+
     public function isValid($template, &$error = null)
     {
         if (!is_string($template)) {
             throw new \InvalidArgumentException('string expected');
         }
 
-        $source  = $this->options['source'];
+        $source = $this->options['source'];
         $adapter = $this->options['adapter'];
 
         $path = $this->resolvePath($template);
@@ -260,8 +290,8 @@ class Loader
         }
 
         try {
-            $lexer    = new Lexer($adapter->getContents($path));
-            $parser   = new Parser($lexer->tokenize());
+            $lexer = new Lexer($adapter->getContents($path));
+            $parser = new Parser($lexer->tokenize());
             $compiler = new Compiler($parser->parse());
         } catch (\Exception $e) {
             $error = $e->getMessage();

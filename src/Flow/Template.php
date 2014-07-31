@@ -16,13 +16,13 @@ abstract class Template
 
     public function __construct($loader, $helpers = array())
     {
-        $this->loader  = $loader;
+        $this->loader = $loader;
         $this->helpers = $helpers;
-        $this->parent  = null;
-        $this->blocks  = array();
-        $this->macros  = array();
+        $this->parent = null;
+        $this->blocks = array();
+        $this->macros = array();
         $this->imports = array();
-        $this->stack   = array();
+        $this->stack = array();
     }
 
     public function loadExtends($template)
@@ -66,8 +66,8 @@ abstract class Template
 
     public function displayBlock($name, $context, $blocks, $macros, $imports)
     {
-        $blocks  = $blocks + $this->blocks;
-        $macros  = $macros + $this->macros;
+        $blocks = $blocks + $this->blocks;
+        $macros = $macros + $this->macros;
         $imports = $imports + $this->imports;
         if (isset($blocks[$name]) && is_callable($blocks[$name])) {
             return call_user_func(
@@ -81,17 +81,18 @@ abstract class Template
         $parent = $this;
         while ($parent = $parent->parent) {
             if (isset($parent->blocks[$name]) &&
-                is_callable($parent->blocks[$name])) {
+                is_callable($parent->blocks[$name])
+            ) {
                 return call_user_func($parent->blocks[$name], $context, $blocks,
-                        $macros, $imports);
+                    $macros, $imports);
             }
         }
     }
 
     public function expandMacro($module, $name, $params, $context, $macros,
-        $imports)
+                                $imports)
     {
-        $macros  = $macros + $this->macros;
+        $macros = $macros + $this->macros;
         $imports = $imports + $this->imports;
         if (isset($module) && isset($imports[$module])) {
             $macros = $macros + $imports[$module];
@@ -109,7 +110,7 @@ abstract class Template
             $this->stack[$name] = array();
         }
         array_push($this->stack[$name], isset($context[$name]) ?
-            $context[$name] : null
+                $context[$name] : null
         );
         return $this;
     }
@@ -149,7 +150,8 @@ abstract class Template
         try {
             $helper = array('Help', $name);
             if (isset($this->helpers[$name]) &&
-                is_callable($this->helpers[$name])) {
+                is_callable($this->helpers[$name])
+            ) {
                 return call_user_func_array($this->helpers[$name], $args);
             } elseif (is_callable($helper)) {
                 return call_user_func_array($helper, $args);
@@ -173,10 +175,10 @@ abstract class Template
     }
 
     abstract public function display($context = array(), $blocks = array(),
-        $macros = array(), $imports = array());
+                                     $macros = array(), $imports = array());
 
     public function render($context = array(), $blocks = array(),
-        $macros = array(), $imports = array())
+                           $macros = array(), $imports = array())
     {
         ob_start();
         $this->display($context, $blocks, $macros);
@@ -266,9 +268,9 @@ abstract class Template
                     );
                 } else {
                     if ($attr === null || $attr === false || $attr === '') {
-                        if ($attr === null)  $token = 'null';
+                        if ($attr === null) $token = 'null';
                         if ($attr === false) $token = 'false';
-                        if ($attr === '')    $token = 'empty string';
+                        if ($attr === '') $token = 'empty string';
                         throw new \RuntimeException(
                             sprintf(
                                 'invalid object attribute (%s) in %s line %d',
