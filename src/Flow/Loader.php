@@ -55,21 +55,16 @@ class Loader
 
         if (!($target = realpath($options['target'])) || !is_dir($target)) {
             if ($options['mkdir'] === false) {
-                throw new \RuntimeException(sprintf(
-                    'target directory %s not found',
-                    $options['target']
-                ));
+                throw new \RuntimeException(sprintf('target directory %s not found', $options['target']));
             }
             if (!mkdir($options['target'], $options['mkdir'], true)) {
-                throw new \RuntimeException(sprintf(
-                    'unable to create target directory %s',
-                    $options['target']
-                ));
+                throw new \RuntimeException(sprintf('unable to create target directory %s', $options['target']));
             }
         }
 
+        $source = $options['source'];
         $this->options = array(
-            'source' => $options['source'],
+            'source' => is_array($source) ? $source : [$source],
             'target' => $target,
             'mode' => $options['mode'],
             'adapter' => $options['adapter'],
@@ -249,6 +244,12 @@ class Loader
         return $this->cache[$class];
     }
 
+    /**
+     * @param $template
+     * @return Template
+     * @throws \InvalidArgumentException
+     * @throws \Exception
+     */
     public function loadFromString($template)
     {
         if (!is_string($template)) {
