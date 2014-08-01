@@ -2,6 +2,7 @@
 
 namespace Mindy\Template\Expression;
 
+use Mindy\Template\Compiler;
 use Mindy\Template\Expression;
 
 class BinaryExpression extends Expression
@@ -16,7 +17,7 @@ class BinaryExpression extends Expression
         $this->right = $right;
     }
 
-    public function compile($compiler, $indent = 0)
+    public function compile(Compiler $compiler, $indent = 0)
     {
         $op = $this->operator($compiler);
         $compiler->raw('(', $indent);

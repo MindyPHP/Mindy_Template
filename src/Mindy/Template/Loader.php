@@ -2,8 +2,8 @@
 
 namespace Mindy\Template;
 
-use Mindy\Template\Adapter\FileAdapter;
 use InvalidArgumentException;
+use Mindy\Template\Adapter\FileAdapter;
 use RuntimeException;
 
 class Loader
@@ -37,7 +37,7 @@ class Loader
         $autoload = true;
     }
 
-    public function __construct($options)
+    public function __construct(array $options = [])
     {
         if (!isset($options['source'])) {
             throw new RuntimeException('missing source directory');
@@ -97,21 +97,23 @@ class Loader
     {
         foreach ($this->options['source'] as $sourcePath) {
             $source = implode('/', $this->normalizePath($sourcePath));
-
-            $parts = $this->normalizePath(
-                $source . '/' . dirname($from) . '/' . $template
-            );
-
-            foreach ($this->normalizePath($source) as $i => $part) {
-                if ($part !== $parts[$i]) {
-                    throw new RuntimeException(sprintf('%s is outside the source directory', $template));
+            $file = $source . '/' . ltrim($template, '/');
+            if(is_file($file)) {
+                $parts = $this->normalizePath($source . '/' . dirname($from) . '/' . $template);
+                foreach ($this->normalizePath($source) as $i => $part) {
+                    if ($part !== $parts[$i]) {
+                        throw new RuntimeException(sprintf('%s is outside the source directory', $template));
+                    }
                 }
+
+                // TODO useless
+                $path = trim(substr(implode('/', $parts), strlen($source)), '/');
+
+                return $template;
             }
-
-            $path = trim(substr(implode('/', $parts), strlen($source)), '/');
-
-            return $path;
         }
+
+        throw new RuntimeException(sprintf('Template %s not found', $template));
     }
 
     public function compile($template, $mode = null)
@@ -146,8 +148,7 @@ class Loader
                 break;
             case self::RECOMPILE_NORMAL:
             default:
-                $compile = !file_exists($target) ||
-                    filemtime($target) < $adapter->lastModified($path);
+                $compile = !file_exists($target) || filemtime($target) < $adapter->lastModified($path);
                 break;
         }
 
@@ -199,8 +200,8 @@ class Loader
             return $this->cache[$class];
         }
 
-        if (!class_exists($class, false)) {
 
+        if (!class_exists($class, false)) {
             if (!$adapter->isReadable($path)) {
                 throw new RuntimeException(sprintf('%s is not a valid readable template', $template));
             }
@@ -300,5 +301,35 @@ class Loader
         }
         return true;
     }
-}
 
+    /**
+     * @param $template
+     * @param array $data
+     * @return string
+     */
+    public function render($template, array $data = [])
+    {
+        return $this->load($template)->render($data);
+    }
+
+    /**
+     * @param $source
+     * @param array $data
+     * @return string
+     */
+    public function renderString($source, array $data = [])
+    {
+        return $this->loadFromString($source)->render($data);
+    }
+
+    public function addHelper($name, $func)
+    {
+        if(is_array($func)) {
+            $this->options['helpers'][$name] = function() use ($func) {
+                return call_user_func($func);
+            };
+        } else {
+            $this->options['helpers'][$name] = $func;
+        }
+    }
+}

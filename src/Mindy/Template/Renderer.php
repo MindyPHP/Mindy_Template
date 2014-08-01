@@ -1,9 +1,9 @@
 <?php
 /**
- * 
+ *
  *
  * All rights reserved.
- * 
+ *
  * @author Falaleev Maxim
  * @email max@studio107.ru
  * @version 1.0
@@ -15,9 +15,19 @@
 namespace Mindy\Template;
 
 
-class Renderer 
+use Mindy\Base\Mindy;
+use Mindy\Helper\Alias;
+
+class Renderer extends Loader
 {
-
+    public function __construct(array $options = [])
+    {
+        if (!isset($options['target'])) {
+            $options['target'] = Alias::get('application.runtime.cache');
+        }
+        if (!isset($options['source'])) {
+            $options['source'] = Mindy::app()->finder->getPaths();
+        }
+        parent::__construct($options);
+    }
 }
-
- 

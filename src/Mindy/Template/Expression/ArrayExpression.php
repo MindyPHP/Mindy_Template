@@ -2,6 +2,7 @@
 
 namespace Mindy\Template\Expression;
 
+use Mindy\Template\Compiler;
 use Mindy\Template\Expression;
 
 class ArrayExpression extends Expression
@@ -14,7 +15,7 @@ class ArrayExpression extends Expression
         $this->elements = $elements;
     }
 
-    public function compile($compiler, $indent = 0)
+    public function compile(Compiler $compiler, $indent = 0)
     {
         $compiler->raw('array(', $indent);
         foreach ($this->elements as $node) {

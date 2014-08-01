@@ -2,6 +2,7 @@
 
 namespace Mindy\Template\Expression;
 
+use Mindy\Template\Compiler;
 use Mindy\Template\Expression;
 
 class MacroExpression extends Expression
@@ -18,7 +19,7 @@ class MacroExpression extends Expression
         $this->args = $args;
     }
 
-    public function compile($compiler, $indent = 0)
+    public function compile(Compiler $compiler, $indent = 0)
     {
         $compiler->raw(
             '$this->expandMacro(\'' . $this->module . '\', \'' . $this->name .

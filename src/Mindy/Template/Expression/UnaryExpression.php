@@ -2,6 +2,7 @@
 
 namespace Mindy\Template\Expression;
 
+use Mindy\Template\Compiler;
 use Mindy\Template\Expression;
 
 class UnaryExpression extends Expression
@@ -14,7 +15,7 @@ class UnaryExpression extends Expression
         $this->node = $node;
     }
 
-    public function compile($compiler, $indent = 0)
+    public function compile(Compiler $compiler, $indent = 0)
     {
         $compiler->raw('(', $indent);
         $this->operator($compiler);

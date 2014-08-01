@@ -2,6 +2,7 @@
 
 namespace Mindy\Template\Expression;
 
+use Mindy\Template\Compiler;
 use Mindy\Template\Expression;
 
 class ConditionalExpression extends Expression
@@ -18,7 +19,7 @@ class ConditionalExpression extends Expression
         $this->expr3 = $expr3;
     }
 
-    public function compile($compiler, $indent = 0)
+    public function compile(Compiler $compiler, $indent = 0)
     {
         $compiler->raw('((', $indent);
         $this->expr1->compile($compiler);

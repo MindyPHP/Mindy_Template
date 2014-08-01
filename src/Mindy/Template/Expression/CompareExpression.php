@@ -2,6 +2,7 @@
 
 namespace Mindy\Template\Expression;
 
+use Mindy\Template\Compiler;
 use Mindy\Template\Expression;
 
 class CompareExpression extends Expression
@@ -16,7 +17,7 @@ class CompareExpression extends Expression
         $this->ops = $ops;
     }
 
-    public function compile($compiler, $indent = 0)
+    public function compile(Compiler $compiler, $indent = 0)
     {
         $this->expr->compile($compiler);
         $i = 0;

@@ -2,6 +2,7 @@
 
 namespace Mindy\Template\Expression;
 
+use Mindy\Template\Compiler;
 use Mindy\Template\Expression;
 
 class FilterExpression extends Expression
@@ -41,7 +42,7 @@ class FilterExpression extends Expression
         return $this;
     }
 
-    public function compile($compiler, $indent = 0)
+    public function compile(Compiler $compiler, $indent = 0)
     {
         static $raw = 'raw';
 

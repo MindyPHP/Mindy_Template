@@ -2,6 +2,9 @@
 
 namespace Mindy\Template;
 
+use Countable;
+use Traversable;
+
 class Helper
 {
     public static function abs($obj = null)
@@ -32,8 +35,7 @@ class Helper
 
     public static function cycle($obj = null)
     {
-        $obj = ($obj instanceof \Traversable) ?
-            iterator_to_array($obj) : (array) $obj;
+        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array) $obj;
         return new Helper\Cycler((array) $obj);
     }
 
@@ -64,8 +66,7 @@ class Helper
         if (is_string($obj)) {
             return strlen($obj) ? substr($obj, 0, 1) : $default;
         }
-        $obj = ($obj instanceof \Traversable) ?
-            iterator_to_array($obj) : (array) $obj;
+        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array) $obj;
         $keys = array_keys($obj);
         if (count($keys)) {
             return $obj[$keys[0]];
@@ -80,9 +81,15 @@ class Helper
 
     public static function is_divisible_by($obj = null, $number = null)
     {
-        if (!isset($number)) return false;
-        if (!is_numeric($obj) || !is_numeric($number)) return false;
-        if ($number == 0) return false;
+        if (!isset($number)) {
+            return false;
+        }
+        if (!is_numeric($obj) || !is_numeric($number)) {
+            return false;
+        }
+        if ($number == 0) {
+            return false;
+        }
         return fmod($obj, $number) == 0;
     }
 
@@ -94,9 +101,9 @@ class Helper
             return empty($obj);
         } elseif (is_string($obj)) {
             return strlen($obj) == 0;
-        } elseif ($obj instanceof \Countable) {
+        } elseif ($obj instanceof Countable) {
             return count($obj) ? false : true;
-        } elseif ($obj instanceof \Traversable) {
+        } elseif ($obj instanceof Traversable) {
             return iterator_count($obj);
         } else {
             return false;
@@ -109,7 +116,7 @@ class Helper
             $obj = is_numeric($obj) ? intval($obj) : strlen($obj);
         } elseif (is_array($obj)) {
             $obj = count($obj);
-        } elseif ($obj instanceof \Traversable) {
+        } elseif ($obj instanceof Traversable) {
             $obj = iterator_count($obj);
         } else {
             return false;
@@ -123,7 +130,7 @@ class Helper
             $obj = is_numeric($obj) ? intval($obj) : strlen($obj);
         } elseif (is_array($obj)) {
             $obj = count($obj);
-        } elseif ($obj instanceof \Traversable) {
+        } elseif ($obj instanceof Traversable) {
             $obj = iterator_count($obj);
         } else {
             return false;
@@ -133,21 +140,20 @@ class Helper
 
     public static function join($obj = null, $glue = '')
     {
-        $obj = ($obj instanceof \Traversable) ?
-            iterator_to_array($obj) : (array) $obj;
+        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array) $obj;
         return join($glue, $obj);
     }
 
     public static function json_encode($obj = null)
     {
-        return json_encode($obj);
+        return json_encode($obj, JSON_UNESCAPED_UNICODE);
     }
 
     public static function keys($obj = null)
     {
         if (is_array($obj)) {
             return array_keys($obj);
-        } elseif ($obj instanceof \Traversable) {
+        } elseif ($obj instanceof Traversable) {
             return array_keys(iterator_to_array($obj));
         }
         return null;
@@ -158,7 +164,7 @@ class Helper
         if (is_string($obj)) {
             return strlen($obj) ? substr($obj, -1) : $default;
         }
-        $obj = ($obj instanceof \Traversable) ?
+        $obj = ($obj instanceof Traversable) ?
             iterator_to_array($obj) : (array) $obj;
         $keys = array_keys($obj);
         if ($len = count($keys)) {
@@ -171,9 +177,9 @@ class Helper
     {
         if (is_string($obj)) {
             return strlen($obj);
-        } elseif (is_array($obj) || ($obj instanceof \Countable)) {
+        } elseif (is_array($obj) || ($obj instanceof Countable)) {
             return count($obj);
-        } elseif ($obj instanceof \Traversable) {
+        } elseif ($obj instanceof Traversable) {
             return iterator_count($obj);
         } else {
             return 1;

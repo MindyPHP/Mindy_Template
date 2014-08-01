@@ -2,6 +2,7 @@
 
 namespace Mindy\Template\Expression;
 
+use Mindy\Template\Compiler;
 use Mindy\Template\Expression;
 
 class FunctionCallExpression extends Expression
@@ -16,7 +17,7 @@ class FunctionCallExpression extends Expression
         $this->args = $args;
     }
 
-    public function compile($compiler, $indent = 0)
+    public function compile(Compiler $compiler, $indent = 0)
     {
         $compiler->raw('$this->helper(');
         $this->node->repr($compiler);

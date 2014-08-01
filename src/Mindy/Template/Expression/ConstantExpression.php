@@ -2,6 +2,7 @@
 
 namespace Mindy\Template\Expression;
 
+use Mindy\Template\Compiler;
 use Mindy\Template\Expression;
 
 class ConstantExpression extends Expression
@@ -14,7 +15,7 @@ class ConstantExpression extends Expression
         $this->value = $value;
     }
 
-    public function compile($compiler, $indent = 0)
+    public function compile(Compiler $compiler, $indent = 0)
     {
         $compiler->repr($this->value);
     }
