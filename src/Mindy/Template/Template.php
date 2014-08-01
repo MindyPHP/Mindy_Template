@@ -2,7 +2,10 @@
 
 namespace Mindy\Template;
 
+use Closure;
+use Exception;
 use Mindy\Template\Helper;
+use RuntimeException;
 
 abstract class Template
 {
@@ -14,7 +17,7 @@ abstract class Template
     protected $imports;
     protected $stack;
 
-    public function __construct($loader, $helpers = array())
+    public function __construct(Loader $loader, $helpers = array())
     {
         $this->loader = $loader;
         $this->helpers = $helpers;
@@ -123,10 +126,10 @@ abstract class Template
         return $this;
     }
 
-    public function getLineTrace(\Exception $e = null)
+    public function getLineTrace(Exception $e = null)
     {
         if (!isset($e)) {
-            $e = new \Exception;
+            $e = new Exception;
         }
 
         $lines = static::$lines;
@@ -148,37 +151,22 @@ abstract class Template
         $name = array_shift($args);
 
         try {
-            $helper = array('Help', $name);
-            if (isset($this->helpers[$name]) &&
-                is_callable($this->helpers[$name])
-            ) {
+            $helper = array('\Mindy\Template\Helper', $name);
+            if (isset($this->helpers[$name]) && is_callable($this->helpers[$name])) {
                 return call_user_func_array($this->helpers[$name], $args);
             } elseif (is_callable($helper)) {
-                return call_user_func_array($helper, $args);
+                return call_user_func_array($helper, array_merge([null], $args));
             }
-        } catch (\Exception $e) {
-            throw new \RuntimeException(
-                sprintf(
-                    '%s in %s line %d',
-                    $e->getMessage(), static::NAME, $this->getLineTrace($e)
-                )
-            );
+        } catch (Exception $e) {
+            throw new RuntimeException(sprintf('%s in %s line %d', $e->getMessage(), static::NAME, $this->getLineTrace($e)));
         }
 
-        throw new \RuntimeException(
-            sprintf(
-                'undefined helper "%s" in %s line %d',
-                $name, static::NAME, $this->getLineTrace()
-            )
-        );
-
+        throw new RuntimeException(sprintf('undefined helper "%s" in %s line %d', $name, static::NAME, $this->getLineTrace()));
     }
 
-    abstract public function display($context = array(), $blocks = array(),
-                                     $macros = array(), $imports = array());
+    abstract public function display($context = array(), $blocks = array(), $macros = array(), $imports = array());
 
-    public function render($context = array(), $blocks = array(),
-                           $macros = array(), $imports = array())
+    public function render($context = array(), $blocks = array(), $macros = array(), $imports = array())
     {
         ob_start();
         $this->display($context, $blocks, $macros);
@@ -187,8 +175,7 @@ abstract class Template
 
     public function iterate($context, $seq)
     {
-        return new Helper\ContextIterator($seq, isset($context['loop']) ?
-            $context['loop'] : null);
+        return new Helper\ContextIterator($seq, isset($context['loop']) ? $context['loop'] : null);
     }
 
     public function getBlocks()
@@ -210,7 +197,7 @@ abstract class Template
     {
         if (is_array($obj)) {
             if (isset($obj[$attr])) {
-                if ($obj[$attr] instanceof \Closure) {
+                if ($obj[$attr] instanceof Closure) {
                     if (is_array($args)) {
                         array_unshift($args, $obj);
                     } else {
@@ -224,25 +211,23 @@ abstract class Template
                 return null;
             }
         } elseif (is_object($obj)) {
-
             if (is_array($args)) {
                 $callable = array($obj, $attr);
-                return is_callable($callable) ?
-                    call_user_func_array($callable, $args) : null;
+                return is_callable($callable) ? call_user_func_array($callable, $args) : null;
             } else {
                 $members = array_keys(get_object_vars($obj));
                 $methods = get_class_methods(get_class($obj));
                 if (in_array($attr, $members)) {
                     return @$obj->$attr;
+                } elseif (in_array('__call', $methods) && method_exists($obj, $attr)) {
+                    return call_user_func_array([$obj, $attr], is_array($args) ? $args : []);
                 } elseif (in_array('__get', $methods)) {
                     return $obj->__get($attr);
                 } else {
                     $callable = array($obj, $attr);
-                    return is_callable($callable) ?
-                        call_user_func($callable) : null;
+                    return is_callable($callable) ? call_user_func($callable) : null;
                 }
             }
-
         } else {
             return null;
         }
@@ -263,28 +248,31 @@ abstract class Template
                     $obj->__set($attr, $value);
                     return;
                 } elseif (property_exists($class, $attr)) {
-                    throw new \RuntimeException(
-                        "inaccessible '$attr' object attribute"
-                    );
+                    throw new RuntimeException("inaccessible '$attr' object attribute");
                 } else {
                     if ($attr === null || $attr === false || $attr === '') {
-                        if ($attr === null) $token = 'null';
-                        if ($attr === false) $token = 'false';
-                        if ($attr === '') $token = 'empty string';
-                        throw new \RuntimeException(
-                            sprintf(
-                                'invalid object attribute (%s) in %s line %d',
-                                $token, static::NAME, $this->getLineTrace()
-                            )
-                        );
+                        if ($attr === null) {
+                            $token = 'null';
+                        }
+                        if ($attr === false) {
+                            $token = 'false';
+                        }
+                        if ($attr === '') {
+                            $token = 'empty string';
+                        }
+                        throw new RuntimeException(sprintf('invalid object attribute (%s) in %s line %d', $token, static::NAME, $this->getLineTrace()));
                     }
                     $obj->{$attr} = null;
                 }
             }
-            if (!isset($obj->$attr)) $obj->$attr = null;
+            if (!isset($obj->$attr)) {
+                $obj->$attr = null;
+            }
             $this->setAttr($obj->$attr, $attrs, $value);
         } else {
-            if (!is_array($obj)) $obj = array();
+            if (!is_array($obj)) {
+                $obj = array();
+            }
             $this->setAttr($obj[$attr], $attrs, $value);
         }
     }
