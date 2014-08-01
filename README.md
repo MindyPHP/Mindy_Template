@@ -1,5 +1,8 @@
 # Flow - Fast PHP Templating Engine
 
+[![Build Status](https://travis-ci.org/studio107/Mindy_Template.svg?branch=master)](https://travis-ci.org/studio107/Mindy_Template)
+
+
 ## Introduction
 
 Flow began life as a major fork of the original Twig templating engine by Armin
