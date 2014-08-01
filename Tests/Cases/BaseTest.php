@@ -52,6 +52,7 @@ class BaseTest extends TestCase
         return [
             ['main.html', '1', []],
             ['main.html', '12', ['data' => 2]],
+            ['global_variable.html', '1', ['global_variable' => 1]],
             ['loop.html', '123456', ['data' => [
                 [1, 2, 3],
                 [4, 5, 6]
