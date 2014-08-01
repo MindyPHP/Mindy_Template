@@ -2,4 +2,4 @@ vendor
 .idea
 *.iml
 composer.lock
-cache
+Tests/cache

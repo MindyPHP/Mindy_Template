@@ -1,5 +1,6 @@
 <?php
-use Flow\Loader;
+
+use Mindy\Template\Loader;
 
 /**
  * 
@@ -21,6 +22,7 @@ class BaseTest extends TestCase
         return new Loader([
             'source' => __DIR__ . '/../templates',
             'target' => __DIR__ . '/../cache',
+            'mode' => Loader::RECOMPILE_ALWAYS
         ]);
     }
 
@@ -50,6 +52,10 @@ class BaseTest extends TestCase
         return [
             ['main.html', '1', []],
             ['main.html', '12', ['data' => 2]],
+            ['loop.html', '123456', ['data' => [
+                [1, 2, 3],
+                [4, 5, 6]
+            ]]],
         ];
     }
 
