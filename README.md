@@ -39,7 +39,7 @@ require 'path/to/src/Flow/Loader.php';
 use Flow\Loader;
 Loader::autoload();
 $flow = new Loader(array(
-    'source' => 'path/to/templates',
+    'source' => 'path/to/templates', // or ['path/to/templates1', 'path/to/templates2']
     'target' => 'path/to/cache',
 ));
 
