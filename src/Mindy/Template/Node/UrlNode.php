@@ -53,10 +53,24 @@ class UrlNode extends Node
 
     protected function compileUrl(Compiler $compiler, $indent)
     {
-        $compiler->raw('\Mindy\Base\Mindy::app()->urlManager->reverse(', $indent);
-        $this->route->compile($compiler, $indent);
-        $compiler->raw(', ', $indent);
-        $this->params->compile($compiler, $indent);
-        $compiler->raw(')', $indent);
+        $compiler->raw('\Mindy\Base\Mindy::app()->urlManager->reverse(');
+        $this->route->compile($compiler);
+        $compiler->raw(', ');
+
+        if($this->params instanceof ArrayExpression) {
+            $this->params->compile($compiler);
+        } else {
+            $compiler->raw('array(');
+            foreach ($this->params as $key => $expression) {
+                if(is_string($key)) {
+                    $compiler->raw("'$key'", 1);
+                } else {
+                    $expression->compile($compiler, 1);
+                }
+                $compiler->raw(',');
+            }
+            $compiler->raw(')');
+        }
+        $compiler->raw(')');
     }
 }

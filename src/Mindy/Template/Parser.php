@@ -2,6 +2,7 @@
 
 namespace Mindy\Template;
 
+use Mindy\Template\Expression\ArrayExpression;
 use Mindy\Template\Expression\FilterExpression;
 
 class Parser
@@ -278,23 +279,38 @@ class Parser
 
     protected function parseUrl($token)
     {
-        $parent = $this->parseExpression();
-        $params = null;
-
-        if ($this->stream->consume(Token::NAME, 'with')) {
-            $this->stream->expect(Token::OPERATOR, '[');
-            $params = $this->parseArrayExpression();
-            $this->stream->expect(Token::OPERATOR, ']');
-        }
-
         $name = null;
-        if ($this->stream->consume(Token::NAME, 'as')) {
-            $token = $this->stream->expect(Token::NAME);
-            $name = $token->getValue();
+        $params = array();
+        $route = $this->parseExpression();
+        while (
+            (
+                $this->stream->test(Token::NAME) ||
+                $this->stream->test(Token::NUMBER) ||
+                $this->stream->test(Token::STRING)
+            ) && !$this->stream->test(Token::BLOCK_END)
+        ) {
+            if ($this->stream->test(Token::NAME) && $this->stream->look()->test(Token::OPERATOR, '=')) {
+                $key = $this->parseName()->getValue();
+                $this->stream->next();
+                $params[$key] = $this->parseExpression();
+            } else if ($this->stream->test(Token::NAME, 'as')) {
+                $this->stream->next();
+                $name = $this->parseName()->getValue();
+            } else if ($this->stream->test(Token::NAME)) {
+                $expression = $this->parseExpression();
+                if($expression instanceof ArrayExpression) {
+                    $params = $expression;
+                    break;
+                } else {
+                    $params[] = $expression;
+                }
+            } else {
+                $params[] = $this->parseExpression();
+            }
         }
 
         $this->stream->expect(Token::BLOCK_END);
-        return new Node\UrlNode($token->getLine(), $parent, $params, $name);
+        return new Node\UrlNode($token->getLine(), $route, $params, $name);
     }
 
     protected function parseSet($token)
@@ -310,11 +326,10 @@ class Parser
                 $this->stream->expect(Token::OPERATOR, ']');
             }
         }
+
         if ($this->stream->consume(Token::OPERATOR, '=')) {
             $value = $this->parseExpression();
-            $node = $this->parseIfModifier(
-                $token, new Node\SetNode($name, $attrs, $value, $token->getLine())
-            );
+            $node = $this->parseIfModifier($token, new Node\SetNode($name, $attrs, $value, $token->getLine()));
             $this->stream->expect(Token::BLOCK_END);
         } else {
             $this->stream->expect(Token::BLOCK_END);
@@ -377,8 +392,7 @@ class Parser
 
         $node = $this->parseIfModifier(
             $token,
-            new Node\ParentNode($this->currentBlock[count($this->currentBlock) - 1],
-                $token->getLine())
+            new Node\ParentNode($this->currentBlock[count($this->currentBlock) - 1], $token->getLine())
         );
         $this->stream->expect(Token::BLOCK_END);
         return $node;
