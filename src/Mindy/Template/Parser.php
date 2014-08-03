@@ -2,7 +2,6 @@
 
 namespace Mindy\Template;
 
-use Mindy\Template\Expression\ArrayExpression;
 use Mindy\Template\Expression\FilterExpression;
 
 class Parser
@@ -32,7 +31,6 @@ class Parser
             'break' => 'parseBreak',
             'continue' => 'parseContinue',
             'extends' => 'parseExtends',
-            'url' => 'parseUrl',
             'set' => 'parseSet',
             'block' => 'parseBlock',
             'parent' => 'parseParent',
@@ -54,6 +52,11 @@ class Parser
     {
         $body = $this->subparse();
         return new Module($this->extends, $this->imports, $this->blocks, $this->macros, $body);
+    }
+
+    public function getStream()
+    {
+        return $this->stream;
     }
 
     protected function subparse($test = null, $next = false)
@@ -93,8 +96,18 @@ class Parser
                             str_replace("\n", '\n', $token->getValue()), $expecting), $token);
                     }
                     $this->stream->next();
-                    if (isset($this->tags[$token->getValue()]) && is_callable(array($this, $this->tags[$token->getValue()]))) {
-                        $node = call_user_func(array($this, $this->tags[$token->getValue()]), $token);
+                    if (isset($this->tags[$token->getValue()])) {
+                        if(is_callable(array($this, $this->tags[$token->getValue()]))) {
+                            $node = call_user_func(array($this, $this->tags[$token->getValue()]), $token);
+                        } else {
+                            foreach($this->libraries as $library) {
+                                $tags = $library->getTags();
+                                if(array_key_exists($token->getValue(), $tags)) {
+                                    $node = call_user_func(array($library, $tags[$token->getValue()]), $token);
+                                    break;
+                                }
+                            }
+                        }
                     } else {
                         throw new SyntaxError(sprintf('missing construct handler "%s"', $token->getValue()), $token);
                     }
@@ -127,7 +140,7 @@ class Parser
         return new NodeList($nodes, $line);
     }
 
-    protected function parseName($expect = true, $match = null)
+    public function parseName($expect = true, $match = null)
     {
         static $constants = array('true', 'false', 'null');
         static $operators = array('and', 'xor', 'or', 'not', 'in');
@@ -139,6 +152,22 @@ class Parser
         } elseif ($expect or $this->stream->test(Token::NAME)) {
             return $this->stream->expect(Token::NAME, $match);
         }
+    }
+
+    /**
+     * @param \Mindy\Template\Library\Library[] $libraries
+     * @return $this
+     */
+    public function setLibraries(array $libraries)
+    {
+        $this->libraries = $libraries;
+        foreach($libraries as $library) {
+            $library->setParser($this);
+            $library->setStream($this->stream);
+
+            $this->tags = array_merge($this->tags, $library->getTags());
+        }
+        return $this;
     }
 
     protected function parseIf($token)
@@ -275,42 +304,6 @@ class Parser
 
         $this->stream->expect(Token::BLOCK_END);
         return null;
-    }
-
-    protected function parseUrl($token)
-    {
-        $name = null;
-        $params = array();
-        $route = $this->parseExpression();
-        while (
-            (
-                $this->stream->test(Token::NAME) ||
-                $this->stream->test(Token::NUMBER) ||
-                $this->stream->test(Token::STRING)
-            ) && !$this->stream->test(Token::BLOCK_END)
-        ) {
-            if ($this->stream->test(Token::NAME) && $this->stream->look()->test(Token::OPERATOR, '=')) {
-                $key = $this->parseName()->getValue();
-                $this->stream->next();
-                $params[$key] = $this->parseExpression();
-            } else if ($this->stream->test(Token::NAME, 'as')) {
-                $this->stream->next();
-                $name = $this->parseName()->getValue();
-            } else if ($this->stream->test(Token::NAME)) {
-                $expression = $this->parseExpression();
-                if($expression instanceof ArrayExpression) {
-                    $params = $expression;
-                    break;
-                } else {
-                    $params[] = $expression;
-                }
-            } else {
-                $params[] = $this->parseExpression();
-            }
-        }
-
-        $this->stream->expect(Token::BLOCK_END);
-        return new Node\UrlNode($token->getLine(), $route, $params, $name);
     }
 
     protected function parseSet($token)
@@ -489,7 +482,7 @@ class Parser
         return $node;
     }
 
-    protected function parseExpression()
+    public function parseExpression()
     {
         return $this->parseConditionalExpression();
     }

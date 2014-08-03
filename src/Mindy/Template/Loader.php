@@ -4,6 +4,8 @@ namespace Mindy\Template;
 
 use InvalidArgumentException;
 use Mindy\Template\Adapter\FileAdapter;
+use Mindy\Template\DefaultLibrary;
+use Mindy\Template\Library;
 use RuntimeException;
 
 class Loader
@@ -17,6 +19,7 @@ class Loader
     protected $options;
     protected $paths;
     protected $cache;
+    protected $libraries = array();
 
     public static function autoload()
     {
@@ -77,6 +80,8 @@ class Loader
 
         $this->paths = array();
         $this->cache = array();
+
+        $this->addLibrary(new DefaultLibrary);
     }
 
     public function normalizePath($path)
@@ -156,6 +161,7 @@ class Loader
             try {
                 $lexer = new Lexer($adapter->getContents($path));
                 $parser = new Parser($lexer->tokenize());
+                $parser->setLibraries($this->libraries);
                 $compiler = new Compiler($parser->parse());
                 $compiler->compile($path, $target);
             } catch (SyntaxError $e) {
@@ -225,6 +231,7 @@ class Loader
                 try {
                     $lexer = new Lexer($adapter->getContents($path));
                     $parser = new Parser($lexer->tokenize());
+                    $parser->setLibraries($this->libraries);
                     $compiler = new Compiler($parser->parse());
                     $compiler->compile($path, $target);
                 } catch (SyntaxError $e) {
@@ -261,6 +268,7 @@ class Loader
         try {
             $lexer = new Lexer($template);
             $parser = new Parser($lexer->tokenize());
+            $parser->setLibraries($this->libraries);
             $compiler = new Compiler($parser->parse());
             $compiler->compile($template, $target);
         } catch (SyntaxError $e) {
@@ -331,5 +339,15 @@ class Loader
         } else {
             $this->options['helpers'][$name] = $func;
         }
+        return $this;
+    }
+
+    public function addLibrary(Library $library)
+    {
+        $this->libraries[] = $library;
+        foreach($library->getHelpers() as $name => $func) {
+            $this->addHelper($name, $func);
+        }
+        return $this;
     }
 }
