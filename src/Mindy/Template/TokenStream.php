@@ -72,13 +72,7 @@ class TokenStream
             if ($token->getType() === Token::EOF) {
                 throw new SyntaxError('unexpected end of file', $token);
             } else {
-                throw new SyntaxError(
-                    sprintf(
-                        'unexpected "%s", expecting %s',
-                        str_replace("\n", '\n', $token->getValue()), $expecting
-                    ),
-                    $token
-                );
+                throw new SyntaxError(sprintf('unexpected "%s", expecting %s', str_replace("\n", '\n', $token->getValue()), $expecting), $token);
             }
         }
         $this->next();

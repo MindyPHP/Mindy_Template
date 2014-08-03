@@ -73,9 +73,7 @@ abstract class Template
         $macros = $macros + $this->macros;
         $imports = $imports + $this->imports;
         if (isset($blocks[$name]) && is_callable($blocks[$name])) {
-            return call_user_func(
-                $blocks[$name], $context, $blocks, $macros, $imports
-            );
+            return call_user_func($blocks[$name], $context, $blocks, $macros, $imports);
         }
     }
 
@@ -83,17 +81,13 @@ abstract class Template
     {
         $parent = $this;
         while ($parent = $parent->parent) {
-            if (isset($parent->blocks[$name]) &&
-                is_callable($parent->blocks[$name])
-            ) {
-                return call_user_func($parent->blocks[$name], $context, $blocks,
-                    $macros, $imports);
+            if (isset($parent->blocks[$name]) && is_callable($parent->blocks[$name])) {
+                return call_user_func($parent->blocks[$name], $context, $blocks, $macros, $imports);
             }
         }
     }
 
-    public function expandMacro($module, $name, $params, $context, $macros,
-                                $imports)
+    public function expandMacro($module, $name, $params, $context, $macros, $imports)
     {
         $macros = $macros + $this->macros;
         $imports = $imports + $this->imports;
@@ -101,9 +95,7 @@ abstract class Template
             $macros = $macros + $imports[$module];
         }
         if (isset($macros[$name]) && is_callable($macros[$name])) {
-            return call_user_func(
-                $macros[$name], $params, $context, $macros, $imports
-            );
+            return call_user_func($macros[$name], $params, $context, $macros, $imports);
         }
     }
 
@@ -112,9 +104,7 @@ abstract class Template
         if (!array_key_exists($name, $this->stack)) {
             $this->stack[$name] = array();
         }
-        array_push($this->stack[$name], isset($context[$name]) ?
-                $context[$name] : null
-        );
+        array_push($this->stack[$name], isset($context[$name]) ? $context[$name] : null);
         return $this;
     }
 

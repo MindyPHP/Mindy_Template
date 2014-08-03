@@ -19,42 +19,40 @@ class Parser
 
     public function __construct(TokenStream $stream)
     {
-        $this->stream  = $stream;
+        $this->stream = $stream;
         $this->extends = null;
-        $this->blocks  = array();
+        $this->blocks = array();
 
         $this->currentBlock = array();
 
         $this->tags = array(
-            'if'            => 'parseIf',
-            'for'           => 'parseFor',
-            'break'         => 'parseBreak',
-            'continue'      => 'parseContinue',
-            'extends'       => 'parseExtends',
-            'set'           => 'parseSet',
-            'block'         => 'parseBlock',
-            'parent'        => 'parseParent',
-            'autoescape'    => 'parseAutoEscape',
+            'if' => 'parseIf',
+            'for' => 'parseFor',
+            'break' => 'parseBreak',
+            'continue' => 'parseContinue',
+            'extends' => 'parseExtends',
+            'url' => 'parseUrl',
+            'set' => 'parseSet',
+            'block' => 'parseBlock',
+            'parent' => 'parseParent',
+            'autoescape' => 'parseAutoEscape',
             'endautoescape' => 'parseEndAutoEscape',
-            'macro'         => 'parseMacro',
-            'import'        => 'parseImport',
-            'include'       => 'parseInclude',
+            'macro' => 'parseMacro',
+            'import' => 'parseImport',
+            'include' => 'parseInclude',
         );
 
-        $this->inForLoop  = 0;
-        $this->macros     = array();
-        $this->inMacro    = false;
-        $this->imports    = array();
+        $this->inForLoop = 0;
+        $this->macros = array();
+        $this->inMacro = false;
+        $this->imports = array();
         $this->autoEscape = array(false);
     }
 
     public function parse()
     {
         $body = $this->subparse();
-        return new Module(
-            $this->extends, $this->imports, $this->blocks,
-            $this->macros, $body
-        );
+        return new Module($this->extends, $this->imports, $this->blocks, $this->macros, $body);
     }
 
     protected function subparse($test = null, $next = false)
@@ -63,92 +61,66 @@ class Parser
         $nodes = array();
         while (!$this->stream->isEOS()) {
             switch ($this->stream->getCurrentToken()->getType()) {
-            case Token::TEXT:
-                $token = $this->stream->next();
-                $nodes[] = new Node\TextNode($token->getValue(), $token->getLine());
-                break;
-            case Token::BLOCK_START:
-                $this->stream->next();
-                $token = $this->stream->getCurrentToken();
-                if ($token->getType() !== Token::NAME) {
-                    throw new SyntaxError(
-                        sprintf(
-                            'unexpected "%s", expecting a valid tag',
-                            str_replace("\n", '\n', $token->getValue())
-                        ),
-                        $token
-                    );
-                }
-                if (!is_null($test) && $token->test($test)) {
-                    if (is_bool($next)) {
-                        $next = $next ? 1 : 0;
+                case Token::TEXT:
+                    $token = $this->stream->next();
+                    $nodes[] = new Node\TextNode($token->getValue(), $token->getLine());
+                    break;
+                case Token::BLOCK_START:
+                    $this->stream->next();
+                    $token = $this->stream->getCurrentToken();
+                    if ($token->getType() !== Token::NAME) {
+                        throw new SyntaxError(sprintf('unexpected "%s", expecting a valid tag',
+                            str_replace("\n", '\n', $token->getValue())), $token);
                     }
-                    $this->stream->skip($next);
-                    return new NodeList($nodes, $line);
-                }
+                    if (!is_null($test) && $token->test($test)) {
+                        if (is_bool($next)) {
+                            $next = $next ? 1 : 0;
+                        }
+                        $this->stream->skip($next);
+                        return new NodeList($nodes, $line);
+                    }
 
-                if (!in_array($token->getValue(), array_keys($this->tags))) {
-                    if (is_array($test)) {
-                        $expecting = '"' . implode('" or "', $test) . '"';
-                    } elseif ($test) {
-                        $expecting = '"' . $test . '"';
-                    } else {
-                        $expecting = 'a valid tag';
+                    if (!in_array($token->getValue(), array_keys($this->tags))) {
+                        if (is_array($test)) {
+                            $expecting = '"' . implode('" or "', $test) . '"';
+                        } elseif ($test) {
+                            $expecting = '"' . $test . '"';
+                        } else {
+                            $expecting = 'a valid tag';
+                        }
+                        throw new SyntaxError(sprintf('unexpected "%s", expecting %s',
+                            str_replace("\n", '\n', $token->getValue()), $expecting), $token);
                     }
-                    throw new SyntaxError(
-                        sprintf(
-                            'unexpected "%s", expecting %s',
-                            str_replace("\n", '\n', $token->getValue()),
-                            $expecting
-                        ),
-                        $token
-                    );
-                }
-                $this->stream->next();
-                if (isset($this->tags[$token->getValue()]) &&
-                    is_callable(array($this, $this->tags[$token->getValue()]))
-                ) {
-                    $node = call_user_func(
-                        array($this, $this->tags[$token->getValue()]), $token
-                    );
-                } else {
-                    throw new SyntaxError(
-                        sprintf(
-                            'missing construct handler "%s"',
-                            $token->getValue()
-                        ),
-                        $token
-                    );
-                }
-                if (!is_null($node)) {
-                    $nodes[] = $node;
-                }
-                break;
+                    $this->stream->next();
+                    if (isset($this->tags[$token->getValue()]) && is_callable(array($this, $this->tags[$token->getValue()]))) {
+                        $node = call_user_func(array($this, $this->tags[$token->getValue()]), $token);
+                    } else {
+                        throw new SyntaxError(sprintf('missing construct handler "%s"', $token->getValue()), $token);
+                    }
+                    if (!is_null($node)) {
+                        $nodes[] = $node;
+                    }
+                    break;
 
-            case Token::OUTPUT_START:
-                $token = $this->stream->next();
-                $expr = $this->parseExpression();
-                $autoEscape = $this->autoEscape[count($this->autoEscape) - 1];
-                if ($autoEscape) {
-                    $filters = array();
-                    if ($expr instanceof FilterExpression) {
-                        if (!$expr->isRaw()) $expr->setAutoEscape(true);
-                    } else {
-                        $expr = new Expression\FilterExpression(
-                            $expr, $filters, true, $token->getLine()
-                        );
+                case Token::OUTPUT_START:
+                    $token = $this->stream->next();
+                    $expr = $this->parseExpression();
+                    $autoEscape = $this->autoEscape[count($this->autoEscape) - 1];
+                    if ($autoEscape) {
+                        $filters = array();
+                        if ($expr instanceof FilterExpression) {
+                            if (!$expr->isRaw()) {
+                                $expr->setAutoEscape(true);
+                            }
+                        } else {
+                            $expr = new Expression\FilterExpression($expr, $filters, true, $token->getLine());
+                        }
                     }
-                }
-                $nodes[] = $this->parseIfModifier(
-                    $token, new Node\OutputNode($expr, $token->getLine())
-                );
-                $this->stream->expect(Token::OUTPUT_END);
-                break;
-            default:
-                throw new SyntaxError(
-                    'parser ended up in unsupported state',
-                    $this->stream->getCurrentToken()
-                );
+                    $nodes[] = $this->parseIfModifier($token, new Node\OutputNode($expr, $token->getLine()));
+                    $this->stream->expect(Token::OUTPUT_END);
+                    break;
+                default:
+                    throw new SyntaxError('parser ended up in unsupported state', $this->stream->getCurrentToken());
             }
         }
         return new NodeList($nodes, $line);
@@ -180,23 +152,23 @@ class Parser
         $end = false;
         while (!$end) {
             switch ($this->stream->next()->getValue()) {
-            case 'elseif':
-                $expr = $this->parseExpression();
-                $this->stream->expect(Token::BLOCK_END);
-                $body = $this->subparse(array('elseif', 'else', 'endif'));
-                $tests[] = array($expr, $body);
-                break;
-            case 'else':
-                $this->stream->expect(Token::BLOCK_END);
-                $else = $this->subparse(array('endif'));
-                break;
-            case 'endif':
-                $this->stream->expect(Token::BLOCK_END);
-                $end = true;
-                break;
-            default:
-                throw new SyntaxError('malformed if statement', $token);
-                break;
+                case 'elseif':
+                    $expr = $this->parseExpression();
+                    $this->stream->expect(Token::BLOCK_END);
+                    $body = $this->subparse(array('elseif', 'else', 'endif'));
+                    $tests[] = array($expr, $body);
+                    break;
+                case 'else':
+                    $this->stream->expect(Token::BLOCK_END);
+                    $else = $this->subparse(array('endif'));
+                    break;
+                case 'endif':
+                    $this->stream->expect(Token::BLOCK_END);
+                    $end = true;
+                    break;
+                default:
+                    throw new SyntaxError('malformed if statement', $token);
+                    break;
             }
         }
         return new Node\IfNode($tests, $else, $line);
@@ -214,8 +186,7 @@ class Parser
                     array(array($test_expr, $node)), null, $token->getLine()
                 );
             } elseif ($statement == 'unless') {
-                $node = new Node\IfNode(
-                    array(array(
+                $node = new Node\IfNode(array(array(
                         new Expression\NotExpression($test_expr, $token->getLine()), $node
                     )), null, $token->getLine()
                 );
@@ -261,9 +232,7 @@ class Parser
         if (!$this->inForLoop) {
             throw new SyntaxError('unexpected break, not in for loop', $token);
         }
-        $node = $this->parseIfModifier(
-            $token, new Node\BreakNode($token->getLine())
-        );
+        $node = $this->parseIfModifier($token, new Node\BreakNode($token->getLine()));
         $this->stream->expect(Token::BLOCK_END);
         return $node;
     }
@@ -271,13 +240,9 @@ class Parser
     protected function parseContinue($token)
     {
         if (!$this->inForLoop) {
-            throw new SyntaxError(
-                'unexpected continue, not in for loop', $token
-            );
+            throw new SyntaxError('unexpected continue, not in for loop', $token);
         }
-        $node = $this->parseIfModifier(
-            $token, new Node\ContinueNode($token->getLine())
-        );
+        $node = $this->parseIfModifier($token, new Node\ContinueNode($token->getLine()));
         $this->stream->expect(Token::BLOCK_END);
         return $node;
     }
@@ -289,15 +254,11 @@ class Parser
         }
 
         if (!empty($this->currentBlock)) {
-            throw new SyntaxError(
-                'cannot declare extends inside blocks', $token
-            );
+            throw new SyntaxError('cannot declare extends inside blocks', $token);
         }
 
         if ($this->inMacro) {
-            throw new SyntaxError(
-                'cannot declare extends inside macros', $token
-            );
+            throw new SyntaxError('cannot declare extends inside macros', $token);
         }
 
         $parent = $this->parseExpression();
@@ -309,21 +270,38 @@ class Parser
             $this->stream->expect(Token::OPERATOR, ']');
         }
 
-        $this->extends = $this->parseIfModifier(
-            $token, new Node\ExtendsNode($parent, $params, $token->getLine())
-        );
+        $this->extends = $this->parseIfModifier($token, new Node\ExtendsNode($parent, $params, $token->getLine()));
 
         $this->stream->expect(Token::BLOCK_END);
         return null;
+    }
+
+    protected function parseUrl($token)
+    {
+        $parent = $this->parseExpression();
+        $params = null;
+
+        if ($this->stream->consume(Token::NAME, 'with')) {
+            $this->stream->expect(Token::OPERATOR, '[');
+            $params = $this->parseArrayExpression();
+            $this->stream->expect(Token::OPERATOR, ']');
+        }
+
+        $name = null;
+        if ($this->stream->consume(Token::NAME, 'as')) {
+            $token = $this->stream->expect(Token::NAME);
+            $name = $token->getValue();
+        }
+
+        $this->stream->expect(Token::BLOCK_END);
+        return new Node\UrlNode($token->getLine(), $parent, $params, $name);
     }
 
     protected function parseSet($token)
     {
         $attrs = array();
         $name = $this->parseName()->getValue();
-        while (!$this->stream->test(Token::OPERATOR, '=') &&
-            !$this->stream->test(Token::BLOCK_END)
-        ) {
+        while (!$this->stream->test(Token::OPERATOR, '=') && !$this->stream->test(Token::BLOCK_END)) {
             if ($this->stream->consume(Token::OPERATOR, '.')) {
                 $attrs[] = $this->parseName()->getValue();
             } else {
@@ -353,16 +331,11 @@ class Parser
     protected function parseBlock($token)
     {
         if ($this->inMacro) {
-            throw new SyntaxError(
-                'cannot declare blocks inside macros', $token
-            );
+            throw new SyntaxError('cannot declare blocks inside macros', $token);
         }
         $name = $this->parseName()->getValue();
         if (isset($this->blocks[$name])) {
-            throw new SyntaxError(
-                sprintf('block "%s" already defined', $name),
-                $token
-            );
+            throw new SyntaxError(sprintf('block "%s" already defined', $name), $token);
         }
         array_push($this->currentBlock, $name);
         if ($this->stream->consume(Token::BLOCK_END)) {
@@ -377,11 +350,11 @@ class Parser
             if ($autoEscape) {
                 $filters = array();
                 if ($expr instanceof FilterExpression) {
-                    if (!$expr->isRaw()) $expr->setAutoEscape(true);
+                    if (!$expr->isRaw()) {
+                        $expr->setAutoEscape(true);
+                    }
                 } else {
-                    $expr = new Expression\FilterExpression(
-                        $expr, $filters, true, $token->getLine()
-                    );
+                    $expr = new Expression\FilterExpression($expr, $filters, true, $token->getLine());
                 }
             }
             $body = new Node\OutputNode($expr, $token->getLine());
@@ -395,9 +368,7 @@ class Parser
     protected function parseParent($token)
     {
         if ($this->inMacro) {
-            throw new SyntaxError(
-                'cannot call parent block inside macros', $token
-            );
+            throw new SyntaxError('cannot call parent block inside macros', $token);
         }
 
         if (empty($this->currentBlock)) {
@@ -407,7 +378,7 @@ class Parser
         $node = $this->parseIfModifier(
             $token,
             new Node\ParentNode($this->currentBlock[count($this->currentBlock) - 1],
-            $token->getLine())
+                $token->getLine())
         );
         $this->stream->expect(Token::BLOCK_END);
         return $node;
@@ -434,24 +405,17 @@ class Parser
     protected function parseMacro($token)
     {
         if (!empty($this->currentBlock)) {
-            throw new SyntaxError(
-                'cannot declare macros inside blocks', $token
-            );
+            throw new SyntaxError('cannot declare macros inside blocks', $token);
         }
 
         if ($this->inMacro) {
-            throw new SyntaxError(
-                'cannot declare macros inside another macro', $token
-            );
+            throw new SyntaxError('cannot declare macros inside another macro', $token);
         }
 
         $this->inMacro = true;
         $name = $this->parseName()->getValue();
         if (isset($this->macros[$name])) {
-            throw new SyntaxError(
-                sprintf('macro "%s" already defined', $name),
-                $token
-            );
+            throw new SyntaxError(sprintf('macro "%s" already defined', $name), $token);
         }
         $args = array();
         if ($this->stream->consume(Token::OPERATOR, '(')) {
@@ -490,9 +454,7 @@ class Parser
         $this->stream->expect(Token::NAME, 'as');
         $module = $this->parseName()->getValue();
         $this->stream->expect(Token::BLOCK_END);
-        $this->imports[$module] = new Node\ImportNode(
-            $module, $import, $token->getLine()
-        );
+        $this->imports[$module] = new Node\ImportNode($module, $import, $token->getLine());
     }
 
     protected function parseInclude($token)
@@ -506,9 +468,8 @@ class Parser
             $this->stream->expect(Token::OPERATOR, ']');
         }
 
-        $node = $this->parseIfModifier(
-            $token, new Node\IncludeNode($include, $params, $token->getLine())
-        );
+        $includeNode = new Node\IncludeNode($include, $params, $token->getLine());
+        $node = $this->parseIfModifier($token, $includeNode);
 
         $this->stream->expect(Token::BLOCK_END);
         return $node;
@@ -603,9 +564,8 @@ class Parser
 
     protected function parseCompareExpression()
     {
-        static $operators = array(
-            '!==', '===', '==', '!=', '<>', '<', '>', '>=', '<='
-        );
+        static $operators = array('!==', '===', '==', '!=', '<>', '<', '>', '>=', '<=');
+
         $line = $this->stream->getCurrentToken()->getLine();
         $expr = $this->parseConcatExpression();
         $ops = array();
@@ -710,10 +670,10 @@ class Parser
     {
         if ($this->stream->test(Token::OPERATOR, array('-', '+'))) {
             switch ($this->stream->getCurrentToken()->getValue()) {
-            case '-':
-                return $this->parseNegExpression();
-            case '+':
-                return $this->parsePosExpression();
+                case '-':
+                    return $this->parseNegExpression();
+                case '+':
+                    return $this->parsePosExpression();
             }
         }
         return $this->parsePrimaryExpression();
@@ -737,47 +697,41 @@ class Parser
     {
         $token = $this->stream->getCurrentToken();
         switch ($token->getType()) {
-        case Token::CONSTANT:
-        case Token::NUMBER:
-        case Token::STRING:
-            $node = $this->parseLiteralExpression();
-            break;
-        case Token::NAME:
-            $this->stream->next();
-            $node = new Expression\NameExpression($token->getValue(), $token->getLine());
-            if ($this->stream->test(Token::OPERATOR, '(')) {
-                $node = $this->parseFunctionCallExpression($node);
-            }
-            break;
-        case Token::CONSTANT:
-        case Token::OPERATOR:
-            if (($name = $this->parseName(false)) !== null) {
-                $node = new Expression\NameExpression(
-                    $name->getValue(), $token->getLine()
-                );
+            case Token::CONSTANT:
+            case Token::NUMBER:
+            case Token::STRING:
+                $node = $this->parseLiteralExpression();
                 break;
-            }
-        default:
-            if ($this->stream->consume(Token::OPERATOR, '@')) {
-                $node = new Expression\FilterExpression(
-                    $this->parseMacroExpression($token), array('raw'), false,
-                    $token->getLine()
-                );
-            } elseif ($this->stream->consume(Token::OPERATOR, '[')) {
-                $node = $this->parseArrayExpression();
-                $this->stream->expect(Token::OPERATOR, ']');
-            } elseif ($this->stream->consume(Token::OPERATOR, '(')) {
-                $node = $this->parseExpression();
-                $this->stream->expect(Token::OPERATOR, ')');
-            } else {
-                throw new SyntaxError(
-                    sprintf(
-                        'unexpected "%s", expecting an expression',
-                        str_replace("\n", '\n', $token->getValue())
-                    ),
-                    $token
-                );
-            }
+            case Token::NAME:
+                $this->stream->next();
+                $node = new Expression\NameExpression($token->getValue(), $token->getLine());
+                if ($this->stream->test(Token::OPERATOR, '(')) {
+                    $node = $this->parseFunctionCallExpression($node);
+                }
+                break;
+            case Token::CONSTANT:
+            case Token::OPERATOR:
+                if (($name = $this->parseName(false)) !== null) {
+                    $node = new Expression\NameExpression(
+                        $name->getValue(), $token->getLine()
+                    );
+                    break;
+                }
+            default:
+                if ($this->stream->consume(Token::OPERATOR, '@')) {
+                    $node = new Expression\FilterExpression(
+                        $this->parseMacroExpression($token), array('raw'), false,
+                        $token->getLine()
+                    );
+                } elseif ($this->stream->consume(Token::OPERATOR, '[')) {
+                    $node = $this->parseArrayExpression();
+                    $this->stream->expect(Token::OPERATOR, ']');
+                } elseif ($this->stream->consume(Token::OPERATOR, '(')) {
+                    $node = $this->parseExpression();
+                    $this->stream->expect(Token::OPERATOR, ')');
+                } else {
+                    throw new SyntaxError(sprintf('unexpected "%s", expecting an expression', str_replace("\n", '\n', $token->getValue())), $token);
+                }
         }
         return $this->parsePostfixExpression($node);
     }
@@ -786,46 +740,34 @@ class Parser
     {
         $token = $this->stream->getCurrentToken();
         switch ($token->getType()) {
-        case Token::CONSTANT:
-            $this->stream->next();
-            switch ($token->getValue()) {
-            case 'true':
-                $node = new Expression\ConstantExpression(true, $token->getLine());
+            case Token::CONSTANT:
+                $this->stream->next();
+                switch ($token->getValue()) {
+                    case 'true':
+                        $node = new Expression\ConstantExpression(true, $token->getLine());
+                        break;
+                    case 'false':
+                        $node = new Expression\ConstantExpression(false, $token->getLine());
+                        break;
+                    case 'null':
+                        $node = new Expression\ConstantExpression(null, $token->getLine());
+                        break;
+                }
                 break;
-            case 'false':
-                $node = new Expression\ConstantExpression(false, $token->getLine());
+            case Token::NUMBER:
+                $this->stream->next();
+                if (preg_match('/\./', $token->getValue())) {
+                    $node = new Expression\ConstantExpression(floatval($token->getValue()), $token->getLine());
+                } else {
+                    $node = new Expression\ConstantExpression(intval($token->getValue()), $token->getLine());
+                }
                 break;
-            case 'null':
-                $node = new Expression\ConstantExpression(null, $token->getLine());
+            case Token::STRING:
+                $this->stream->next();
+                $node = new Expression\StringExpression(strval($token->getValue()), $token->getLine());
                 break;
-            }
-            break;
-        case Token::NUMBER:
-            $this->stream->next();
-            if (preg_match('/\./', $token->getValue())) {
-                $node = new Expression\ConstantExpression(
-                    floatval($token->getValue()), $token->getLine()
-                );
-            } else {
-                $node = new Expression\ConstantExpression(
-                    intval($token->getValue()), $token->getLine()
-                );
-            }
-            break;
-        case Token::STRING:
-            $this->stream->next();
-            $node = new Expression\StringExpression(
-                strval($token->getValue()), $token->getLine()
-            );
-            break;
-        default:
-            throw new SyntaxError(
-                sprintf(
-                    'unexpected "%s", expecting an expression',
-                    str_replace("\n", '\n', $token->getValue())
-                ),
-                $token
-            );
+            default:
+                throw new SyntaxError(sprintf('unexpected "%s", expecting an expression', str_replace("\n", '\n', $token->getValue())), $token);
         }
         return $this->parsePostfixExpression($node);
     }
@@ -838,7 +780,9 @@ class Parser
         while (!$this->stream->test(Token::OPERATOR, ')')) {
             if (!empty($args)) {
                 $this->stream->expect(Token::OPERATOR, ',');
-                if ($this->stream->test(Token::OPERATOR, ')')) break;
+                if ($this->stream->test(Token::OPERATOR, ')')) {
+                    break;
+                }
             }
             $args[] = $this->parseExpression();
         }
@@ -863,13 +807,14 @@ class Parser
             while (!$this->stream->test(Token::OPERATOR, ')')) {
                 if (!empty($args)) {
                     $this->stream->expect(Token::OPERATOR, ',');
-                    if ($this->stream->test(Token::OPERATOR, ')'))
+                    if ($this->stream->test(Token::OPERATOR, ')')) {
                         break;
+                    }
                 }
                 if (($this->stream->test(Token::NAME) ||
-                    $this->stream->test(Token::CONSTANT, $constants) ||
-                    $this->stream->test(Token::OPERATOR, $operators)) &&
-                    $this->stream->look()->test(Token::OPERATOR, '=')
+                        $this->stream->test(Token::CONSTANT, $constants) ||
+                        $this->stream->test(Token::OPERATOR, $operators)
+                    ) && $this->stream->look()->test(Token::OPERATOR, '=')
                 ) {
                     $key = $this->parseName()->getValue();
                     $this->stream->expect(Token::OPERATOR, '=');
@@ -891,25 +836,14 @@ class Parser
         do {
             $token = $this->stream->getCurrentToken();
             if ($token->test(Token::OPERATOR, ']')) break;
-            if ($token->test(Token::NAME) ||
-                $token->test(Token::STRING) ||
-                $token->test(Token::NUMBER)
-            ) {
-                if ($token->test(Token::NAME) ||
-                    $token->test(Token::STRING)
-                ) {
-                    $key = new Expression\ConstantExpression(
-                        strval($token->getValue()), $line
-                    );
+            if ($token->test(Token::NAME) || $token->test(Token::STRING) || $token->test(Token::NUMBER)) {
+                if ($token->test(Token::NAME) || $token->test(Token::STRING)) {
+                    $key = new Expression\ConstantExpression(strval($token->getValue()), $line);
                 } else {
                     if (preg_match('/\./', $token->getValue())) {
-                        $key = new Expression\ConstantExpression(
-                            floatval($token->getValue()), $line
-                        );
+                        $key = new Expression\ConstantExpression(floatval($token->getValue()), $line);
                     } else {
-                        $key = new Expression\ConstantExpression(
-                            intval($token->getValue()), $line
-                        );
+                        $key = new Expression\ConstantExpression(intval($token->getValue()), $line);
                     }
                 }
                 $this->stream->next();
@@ -930,20 +864,18 @@ class Parser
     protected function parsePostfixExpression($node)
     {
         $stop = false;
-        while (!$stop &&
-            $this->stream->getCurrentToken()->getType() == Token::OPERATOR
-        ) {
+        while (!$stop && $this->stream->getCurrentToken()->getType() == Token::OPERATOR) {
             switch ($this->stream->getCurrentToken()->getValue()) {
-            case '.':
-            case '[':
-                $node = $this->parseAttributeExpression($node);
-                break;
-            case '|':
-                $node = $this->parseFilterExpression($node);
-                break;
-            default:
-                $stop = true;
-                break;
+                case '.':
+                case '[':
+                    $node = $this->parseAttributeExpression($node);
+                    break;
+                case '|':
+                    $node = $this->parseFilterExpression($node);
+                    break;
+                default:
+                    $stop = true;
+                    break;
             }
         }
         return $node;
@@ -953,10 +885,7 @@ class Parser
     {
         $token = $this->stream->getCurrentToken();
         if ($this->stream->consume(Token::OPERATOR, '.')) {
-            $attr = new Expression\ConstantExpression(
-                $this->parseName()->getValue(),
-                $token->getLine()
-            );
+            $attr = new Expression\ConstantExpression($this->parseName()->getValue(), $token->getLine());
         } else {
             $this->stream->expect(Token::OPERATOR, '[');
             $attr = $this->parseExpression();
@@ -991,8 +920,9 @@ class Parser
                 while (!$this->stream->test(Token::OPERATOR, ')')) {
                     if (!empty($args)) {
                         $this->stream->expect(Token::OPERATOR, ',');
-                        if ($this->stream->test(Token::OPERATOR, ')'))
+                        if ($this->stream->test(Token::OPERATOR, ')')) {
                             break;
+                        }
                     }
                     $args[] = $this->parseExpression();
                 }
@@ -1000,9 +930,7 @@ class Parser
             }
 
             $filters[] = array($token->getValue(), $args);
-
         }
         return new Expression\FilterExpression($node, $filters, false, $line);
     }
 }
-

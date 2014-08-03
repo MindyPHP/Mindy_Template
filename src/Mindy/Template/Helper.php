@@ -66,7 +66,7 @@ class Helper
         if (is_string($obj)) {
             return strlen($obj) ? substr($obj, 0, 1) : $default;
         }
-        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array) $obj;
+        $obj = $obj instanceof Traversable ? iterator_to_array($obj) : (array) $obj;
         $keys = array_keys($obj);
         if (count($keys)) {
             return $obj[$keys[0]];

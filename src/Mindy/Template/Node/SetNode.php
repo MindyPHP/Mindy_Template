@@ -32,8 +32,11 @@ class SetNode extends Node
             $compiler->addTraceInfo($this, $indent);
             $compiler->raw("\$this->setAttr($name, array(", $indent);
             foreach ($this->attrs as $attr) {
-                is_string($attr) ?
-                    $compiler->repr($attr) : $attr->compile($compiler);
+                if(is_string($attr)) {
+                    $compiler->repr($attr);
+                } else {
+                    $attr->compile($compiler);
+                }
                 $compiler->raw(', ');
             }
             $compiler->raw('), ob_get_clean());' . "\n");

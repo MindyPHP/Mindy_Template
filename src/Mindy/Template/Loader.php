@@ -57,7 +57,7 @@ class Loader
             $options['adapter'] = new FileAdapter($options['source']);
         }
 
-        if (!($target = realpath($options['target'])) || !is_dir($target)) {
+        if (!is_dir($options['target'])) {
             if ($options['mkdir'] === false) {
                 throw new RuntimeException(sprintf('target directory %s not found', $options['target']));
             }
@@ -69,7 +69,7 @@ class Loader
         $source = $options['source'];
         $this->options = array(
             'source' => is_array($source) ? $source : [$source],
-            'target' => $target,
+            'target' => $options['target'],
             'mode' => $options['mode'],
             'adapter' => $options['adapter'],
             'helpers' => $options['helpers'],
