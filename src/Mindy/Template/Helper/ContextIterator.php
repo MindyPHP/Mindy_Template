@@ -5,6 +5,7 @@ namespace Mindy\Template\Helper;
 use ArrayIterator;
 use Countable;
 use Iterator;
+use IteratorAggregate;
 use Traversable;
 
 class ContextIterator implements Iterator
@@ -13,7 +14,10 @@ class ContextIterator implements Iterator
 
     public function __construct($sequence, $parent)
     {
-        if ($sequence instanceof Traversable) {
+        if($sequence instanceof IteratorAggregate) {
+            $this->length = ($sequence instanceof Countable) ? count($sequence) : iterator_count($sequence);
+            $this->sequence = $sequence->getIterator();
+        } elseif ($sequence instanceof Traversable) {
             $this->length = ($sequence instanceof Countable) ? count($sequence) : iterator_count($sequence);
             $this->sequence = $sequence;
         } elseif (is_array($sequence)) {
