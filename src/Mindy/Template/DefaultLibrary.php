@@ -16,6 +16,7 @@ namespace Mindy\Template;
 
 
 use Mindy\Template\Expression\ArrayExpression;
+use Mindy\Template\Node\CsrfTokenNode;
 use Mindy\Template\Node\UrlNode;
 
 class DefaultLibrary extends Library
@@ -35,7 +36,14 @@ class DefaultLibrary extends Library
     {
         return [
             'url' => 'parseUrl',
+            'csrf_token' => 'parseCsrfToken',
         ];
+    }
+
+    public function parseCsrfToken($token)
+    {
+        $this->stream->expect(Token::BLOCK_END);
+        return new CsrfTokenNode($token->getLine());
     }
 
     public function parseUrl($token)
