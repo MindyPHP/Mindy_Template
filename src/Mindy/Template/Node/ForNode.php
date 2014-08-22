@@ -27,7 +27,11 @@ class ForNode extends Node
     {
         $compiler->addTraceInfo($this, $indent);
 
+        // Django template engine compatible
+        $compiler->pushContext('forloop', $indent);
+        // Twig template engine compatible
         $compiler->pushContext('loop', $indent);
+
         if ($this->key) {
             $compiler->pushContext($this->key, $indent);
         }
@@ -41,10 +45,10 @@ class ForNode extends Node
             $else = true;
         }
 
-        $compiler->raw(
-            'foreach (($context[\'loop\'] = $this->iterate($context, ',
-            $else ? ($indent + 1) : $indent
-        );
+        // Django template engine compatible
+        // Twig template engine compatible
+        $compiler->raw('foreach (($context[\'forloop\'] = $context[\'loop\'] = $this->iterate($context, ',
+            $else ? ($indent + 1) : $indent);
         $this->seq->compile($compiler);
 
         if ($this->key) {
@@ -68,6 +72,9 @@ class ForNode extends Node
             $compiler->raw("}\n", $indent);
         }
 
+        // Django template engine compatible
+        $compiler->popContext('forloop', $indent);
+        // Twig template engine compatible
         $compiler->popContext('loop', $indent);
         if ($this->key) {
             $compiler->popContext($this->key, $indent);
