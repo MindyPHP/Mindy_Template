@@ -27,7 +27,7 @@ class NameExpression extends Expression
 
     public function compile(Compiler $compiler, $indent = 0)
     {
-        $compiler->raw('(isset($context[\'' . $this->name . '\']) ? ');
+        $compiler->raw('(array_key_exists(\'' . $this->name . '\', $context) ? ');
         $compiler->raw('$context[\'' . $this->name . '\'] : null)');
     }
 }
