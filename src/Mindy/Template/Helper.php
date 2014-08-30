@@ -3,6 +3,7 @@
 namespace Mindy\Template;
 
 use Countable;
+use Mindy\Template\Helper\RangeIterator;
 use Traversable;
 
 class Helper
@@ -39,9 +40,14 @@ class Helper
         return new Helper\Cycler((array) $obj);
     }
 
+    public static function time($obj = null)
+    {
+        return time();
+    }
+
     public static function date($obj = null, $format = 'Y-m-d')
     {
-        return date($format, $obj ?: time());
+        return date($format, $obj ? $obj : time());
     }
 
     public static function dump($obj = null)
@@ -164,8 +170,7 @@ class Helper
         if (is_string($obj)) {
             return strlen($obj) ? substr($obj, -1) : $default;
         }
-        $obj = ($obj instanceof Traversable) ?
-            iterator_to_array($obj) : (array) $obj;
+        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array) $obj;
         $keys = array_keys($obj);
         if ($len = count($keys)) {
             return $obj[$keys[$len - 1]];
@@ -182,7 +187,7 @@ class Helper
         } elseif ($obj instanceof Traversable) {
             return iterator_count($obj);
         } else {
-            return 1;
+            return null;
         }
     }
 
@@ -196,8 +201,7 @@ class Helper
         return nl2br(strval($obj), $is_xhtml);
     }
 
-    public static function number_format($obj = null, $decimals = 0,
-        $dec_point = '.', $thousands_sep = ',')
+    public static function number_format($obj = null, $decimals = 0, $dec_point = '.', $thousands_sep = ',')
     {
         return number_format(strval($obj), $decimals, $dec_point, $thousands_sep);
     }
@@ -237,14 +241,14 @@ class Helper
         return trim(strval($obj), $charlist);
     }
 
-    public static function truncate($obj = null, $length = 255,
-        $preserve_words = false, $hellip = '&hellip;')
+    public static function truncate($obj = null, $length = 255, $preserve_words = false, $hellip = '&hellip;')
     {
         $obj = strval($obj);
-
         $len = strlen($obj);
 
-        if ($length >= $len) return $obj;
+        if ($length >= $len) {
+            return $obj;
+        }
 
         $truncated = $preserve_words ?
             preg_replace('/\s+?(\S+)?$/', '', substr($obj, 0, $length + 1)) :
@@ -268,8 +272,7 @@ class Helper
         return urlencode(strval($obj));
     }
 
-    public static function word_wrap($obj = null, $width = 75, $break = "\n",
-        $cut = false)
+    public static function word_wrap($obj = null, $width = 75, $break = "\n", $cut = false)
     {
         return wordwrap(strval($obj), $width, $break, $cut);
     }

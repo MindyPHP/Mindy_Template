@@ -9,6 +9,7 @@ use RuntimeException;
 
 abstract class Template
 {
+    public $helperClassName = '\Mindy\Template\Helper';
     protected $loader;
     protected $helpers;
     protected $parent;
@@ -138,11 +139,13 @@ abstract class Template
         $name = array_shift($args);
 
         try {
-            $helper = array('\Mindy\Template\Helper', $name);
             if (isset($this->helpers[$name]) && is_callable($this->helpers[$name])) {
                 return call_user_func_array($this->helpers[$name], $args);
-            } elseif (is_callable($helper)) {
-                return call_user_func_array($helper, array_merge([null], $args));
+            }
+
+            $helper = array($this->helperClassName, $name);
+            if (is_callable($helper)) {
+                return call_user_func_array($helper, $args);
             }
         } catch (Exception $e) {
             throw new RuntimeException(sprintf('%s in %s line %d', $e->getMessage(), static::NAME, $this->getLineTrace($e)));
@@ -162,7 +165,14 @@ abstract class Template
 
     public function iterate($context, $seq)
     {
-        return new Helper\ContextIterator($seq, isset($context['loop']) ? $context['loop'] : null);
+        if (isset($context['loop'])) {
+            $iter = $context['loop'];
+        } elseif (isset($context['forloop'])) {
+            $iter = $context['forloop'];
+        } else {
+            $iter = null;
+        }
+        return new Helper\ContextIterator($seq, $iter);
     }
 
     public function getBlocks()
