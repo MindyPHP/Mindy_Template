@@ -36,8 +36,8 @@ class Helper
 
     public static function cycle($obj = null)
     {
-        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array) $obj;
-        return new Helper\Cycler((array) $obj);
+        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array)$obj;
+        return new Helper\Cycler((array)$obj);
     }
 
     public static function time($obj = null)
@@ -72,7 +72,7 @@ class Helper
         if (is_string($obj)) {
             return strlen($obj) ? substr($obj, 0, 1) : $default;
         }
-        $obj = $obj instanceof Traversable ? iterator_to_array($obj) : (array) $obj;
+        $obj = $obj instanceof Traversable ? iterator_to_array($obj) : (array)$obj;
         $keys = array_keys($obj);
         if (count($keys)) {
             return $obj[$keys[0]];
@@ -146,7 +146,7 @@ class Helper
 
     public static function join($obj = null, $glue = '')
     {
-        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array) $obj;
+        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array)$obj;
         return join($glue, $obj);
     }
 
@@ -170,7 +170,7 @@ class Helper
         if (is_string($obj)) {
             return strlen($obj) ? substr($obj, -1) : $default;
         }
-        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array) $obj;
+        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array)$obj;
         $keys = array_keys($obj);
         if ($len = count($keys)) {
             return $obj[$keys[$len - 1]];
@@ -181,7 +181,7 @@ class Helper
     public static function length($obj = null)
     {
         if (is_string($obj)) {
-            return strlen($obj);
+            return mb_strlen((string)$obj, 'UTF-8');
         } elseif (is_array($obj) || ($obj instanceof Countable)) {
             return count($obj);
         } elseif ($obj instanceof Traversable) {
@@ -217,7 +217,7 @@ class Helper
     }
 
     public static function replace($obj = null, $search = '', $replace = '',
-        $regex = false)
+                                   $regex = false)
     {
         if ($regex) {
             return preg_replace($search, $replace, strval($obj));

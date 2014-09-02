@@ -31,6 +31,7 @@ class Parser
             'break' => 'parseBreak',
             'continue' => 'parseContinue',
             'extends' => 'parseExtends',
+            'comment' => 'parseComment',
             'set' => 'parseSet',
             'block' => 'parseBlock',
             'parent' => 'parseParent',
@@ -302,6 +303,18 @@ class Parser
 
         $this->extends = $this->parseIfModifier($token, new Node\ExtendsNode($parent, $params, $token->getLine()));
 
+        $this->stream->expect(Token::BLOCK_END);
+        return null;
+    }
+
+    protected function parseComment($token)
+    {
+        if ($this->stream->consume(Token::BLOCK_END)) {
+            $this->subparse('endcomment');
+            if ($this->stream->next()->getValue() != 'endcomment') {
+                throw new SyntaxError('malformed comment statement', $token);
+            }
+        }
         $this->stream->expect(Token::BLOCK_END);
         return null;
     }
