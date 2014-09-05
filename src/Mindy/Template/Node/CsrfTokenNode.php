@@ -23,6 +23,6 @@ class CsrfTokenNode extends Node
     public function compile(Compiler $compiler, $indent = 0)
     {
         $compiler->addTraceInfo($this, $indent);
-        $compiler->raw("echo '<input type=\"hidden\" value=\"' . \\Mindy\\Base\\Mindy::app()->request->getCsrfToken() . '\" name=\"' . \\Mindy\\Base\\Mindy::app()->request->csrfTokenName . '\" />';\n", $indent);
+        $compiler->raw("echo '<input type=\"hidden\" value=\'' . \\Mindy\\Base\\Mindy::app()->request->csrf->getValue() . '\' name=\"' . \\Mindy\\Base\\Mindy::app()->request->csrf->getName() . '\" />';\n", $indent);
     }
 }

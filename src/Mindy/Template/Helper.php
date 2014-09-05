@@ -8,6 +8,8 @@ use Traversable;
 
 class Helper
 {
+    public static $encoding = 'UTF-8';
+
     public static function abs($obj = null)
     {
         return abs(intval($obj));
@@ -31,7 +33,8 @@ class Helper
 
     public static function capitalize($obj)
     {
-        return ucfirst(strval($obj));
+        $str = strval($obj);
+        return mb_strtoupper(mb_substr($str, 0, 1, self::$encoding), self::$encoding) . mb_strtolower(mb_substr($str, 1, mb_strlen($str), self::$encoding), self::$encoding);
     }
 
     public static function cycle($obj = null)
@@ -64,7 +67,7 @@ class Helper
 
     public static function escape($obj = null, $force = false)
     {
-        return htmlspecialchars(strval($obj), ENT_QUOTES, 'UTF-8', $force);
+        return htmlspecialchars(strval($obj), ENT_QUOTES, self::$encoding, $force);
     }
 
     public static function first($obj = null, $default = null)
@@ -146,8 +149,7 @@ class Helper
 
     public static function join($obj = null, $glue = '')
     {
-        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array)$obj;
-        return join($glue, $obj);
+        return join($glue, ($obj instanceof Traversable) ? iterator_to_array($obj) : (array)$obj);
     }
 
     public static function json_encode($obj = null)
@@ -181,7 +183,7 @@ class Helper
     public static function length($obj = null)
     {
         if (is_string($obj)) {
-            return mb_strlen((string)$obj, 'UTF-8');
+            return mb_strlen((string)$obj, self::$encoding);
         } elseif (is_array($obj) || ($obj instanceof Countable)) {
             return count($obj);
         } elseif ($obj instanceof Traversable) {
@@ -193,7 +195,7 @@ class Helper
 
     public static function lower($obj = null)
     {
-        return strtolower(strval($obj));
+        return mb_strtolower(strval($obj), self::$encoding);
     }
 
     public static function nl2br($obj = null, $is_xhtml = false)
@@ -216,8 +218,7 @@ class Helper
         return str_repeat(strval($obj), $times);
     }
 
-    public static function replace($obj = null, $search = '', $replace = '',
-                                   $regex = false)
+    public static function replace($obj = null, $search = '', $replace = '', $regex = false)
     {
         if ($regex) {
             return preg_replace($search, $replace, strval($obj));
@@ -250,10 +251,7 @@ class Helper
             return $obj;
         }
 
-        $truncated = $preserve_words ?
-            preg_replace('/\s+?(\S+)?$/', '', substr($obj, 0, $length + 1)) :
-            substr($obj, 0, $length);
-
+        $truncated = $preserve_words ? preg_replace('/\s+?(\S+)?$/', '', substr($obj, 0, $length + 1)) : substr($obj, 0, $length);
         return $truncated . $hellip;
     }
 
@@ -264,7 +262,7 @@ class Helper
 
     public static function upper($obj = null)
     {
-        return strtoupper(strval($obj));
+        return mb_strtoupper(strval($obj), self::$encoding);
     }
 
     public static function url_encode($obj = null)

@@ -23,7 +23,7 @@ class FileAdapter implements Adapter
                 if($absPath = realpath($path)) {
                     $paths[] = $absPath;
                 } else {
-                    throw new RuntimeException(sprintf('source directory %s not found', $source));
+                    throw new RuntimeException(sprintf('source directory %s not found', $path));
                 }
             }
         }
