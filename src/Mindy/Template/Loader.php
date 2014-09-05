@@ -110,10 +110,6 @@ class Loader
                         throw new RuntimeException(sprintf('%s is outside the source directory', $template));
                     }
                 }
-
-                // TODO useless
-                $path = trim(substr(implode('/', $parts), strlen($source)), '/');
-
                 return $template;
             }
         }
