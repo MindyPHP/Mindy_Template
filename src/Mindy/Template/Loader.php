@@ -16,7 +16,10 @@ class Loader
     const RECOMPILE_NORMAL = 0;
     const RECOMPILE_ALWAYS = 1;
 
-    protected $options;
+    /**
+     * @var array
+     */
+    protected $options = array();
     protected $paths;
     protected $cache;
     protected $libraries = array();

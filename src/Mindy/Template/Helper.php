@@ -50,6 +50,9 @@ class Helper
 
     public static function date($obj = null, $format = 'Y-m-d')
     {
+        if(!is_numeric($obj) && is_string($obj)) {
+            $obj = strtotime($obj);
+        }
         return date($format, $obj ? $obj : time());
     }
 
@@ -258,6 +261,11 @@ class Helper
     public static function unescape($obj = null)
     {
         return htmlspecialchars_decode(strval($obj), ENT_QUOTES);
+    }
+
+    public static function chunk($obj = null, $by)
+    {
+        return $obj ? array_chunk($obj, $by) : null;
     }
 
     public static function upper($obj = null)

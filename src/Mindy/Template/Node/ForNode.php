@@ -39,7 +39,7 @@ class ForNode extends Node
 
         $else = false;
         if (!is_null($this->else)) {
-            $compiler->raw('if (!Mindy\Template\Helper\is_empty(', $indent);
+            $compiler->raw('if (!Mindy\Template\Helper::is_empty(', $indent);
             $this->seq->compile($compiler);
             $compiler->raw(")) {\n");
             $else = true;
