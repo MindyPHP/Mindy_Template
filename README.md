@@ -378,7 +378,7 @@ It's possible to dynamically access an object or array attributes:
 
     Your name: {{ user[attr] }}
 
-## Helpers 
+## Helpers
 
 Helpers are simple functions you can use to test or modify values prior to use.
 There are two ways you can use them:
@@ -755,7 +755,7 @@ To call them:
     {{ @bolder("this is great!") }}
 
 Macro calls are prepended with the `@` character. This is done to avoid name
-collisions with helpers, method calls and attribute access. 
+collisions with helpers, method calls and attribute access.
 
 All parameters are optional; they default to `null` while extra positional
 arguments passed are ignored. Flow lets you define a custom default value for
@@ -1037,13 +1037,13 @@ While the same example, this time without any white-space control:
 Will yield the rather sparse
 
     <ul>
-        
+
         <li>Alice</li>
-        
+
         <li>Bob</li>
-        
+
         <li>Charlie</li>
-        
+
     </ul>
 
 The semantics are as follows:
@@ -1059,18 +1059,18 @@ The semantics are as follows:
 ```
 {% spaceless %}
 <ul>
-        
+
         <li>Alice</li>
-        
+
         <li>Bob</li>
-        
+
         <li>Charlie</li>
-        
+
 </ul>
 {% endspaceless %}
 ```
 
-Result: 
+Result:
 
 ```
 <ul><li>Alice</li><li>Bob</li><li>Charlie</li></ul>
