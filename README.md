@@ -1054,6 +1054,28 @@ The semantics are as follows:
 - `-%}`, `-}}`, and `-#}` delimiters will remove all whitespace to their right
   **up to and including** the first newline it encounters.
 
+### The `spaceless` template tag:
+
+```
+{% spaceless %}
+<ul>
+        
+        <li>Alice</li>
+        
+        <li>Bob</li>
+        
+        <li>Charlie</li>
+        
+</ul>
+{% endspaceless %}
+```
+
+Result: 
+
+```
+<ul><li>Alice</li><li>Bob</li><li>Charlie</li></ul>
+```
+
 ## Raw output
 
 Sometimes you need to output raw blocks of text, as in the case of code. You
