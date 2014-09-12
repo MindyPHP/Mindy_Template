@@ -21,7 +21,7 @@ class FilterExpression extends Expression
 
     public function isRaw()
     {
-        return in_array('raw', $this->filters);
+        return in_array('raw', $this->filters) || in_array('safe', $this->filters);
     }
 
     public function setAutoEscape($autoEscape = true)
@@ -74,7 +74,7 @@ class FilterExpression extends Expression
 
         $this->node->compile($compiler);
 
-        foreach (array_reverse($postponed) as $i => $arguments) {
+        foreach (array_reverse($postponed) as $arguments) {
             foreach ($arguments as $arg) {
                 $compiler->raw(', ');
                 $arg->compile($compiler);
