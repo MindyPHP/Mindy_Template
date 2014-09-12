@@ -44,13 +44,13 @@ class FilterExpression extends Expression
 
     public function compile(Compiler $compiler, $indent = 0)
     {
-        static $raw = 'raw';
+        static $rawNames = array('raw', 'safe');
 
         $safe = false;
         $postponed = array();
 
         foreach ($this->filters as $i => $filter) {
-            if ($filter[0] == $raw) {
+            if (in_array($filter[0], $rawNames)) {
                 $safe = true;
                 break;
             }
@@ -61,9 +61,13 @@ class FilterExpression extends Expression
         }
 
         for ($i = count($this->filters) - 1; $i >= 0; --$i) {
-            if ($this->filters[$i] === 'raw') continue;
+            if ($this->filters[$i] === 'raw') {
+                continue;
+            }
             list($name, $arguments) = $this->filters[$i];
-            if ($name == $raw) continue;
+            if (in_array($name, $rawNames)) {
+                continue;
+            }
             $compiler->raw('$this->helper(\'' . $name . '\', ');
             $postponed[] = $arguments;
         }

@@ -57,6 +57,7 @@ class Loader
             'mode' => self::RECOMPILE_NORMAL,
             'mkdir' => 0777,
             'helpers' => array(),
+            'autoEscape' => true
         );
 
         if (!isset($options['adapter'])) {
@@ -79,6 +80,7 @@ class Loader
             'mode' => $options['mode'],
             'adapter' => $options['adapter'],
             'helpers' => $options['helpers'],
+            'autoEscape' => $options['autoEscape'],
         );
 
         $this->paths = array();
@@ -160,6 +162,7 @@ class Loader
             try {
                 $lexer = new Lexer($adapter->getContents($path));
                 $parser = new Parser($lexer->tokenize());
+                $parser->setAutoEscape($this->options['autoEscape']);
                 $parser->setLibraries($this->libraries);
                 $compiler = new Compiler($parser->parse());
                 $compiler->compile($path, $target);
@@ -230,6 +233,7 @@ class Loader
                 try {
                     $lexer = new Lexer($adapter->getContents($path));
                     $parser = new Parser($lexer->tokenize());
+                    $parser->setAutoEscape($this->options['autoEscape']);
                     $parser->setLibraries($this->libraries);
                     $compiler = new Compiler($parser->parse());
                     $compiler->compile($path, $target);
@@ -267,6 +271,7 @@ class Loader
         try {
             $lexer = new Lexer($template);
             $parser = new Parser($lexer->tokenize());
+            $parser->setAutoEscape($this->options['autoEscape']);
             $parser->setLibraries($this->libraries);
             $compiler = new Compiler($parser->parse());
             $compiler->compile($template, $target);
@@ -301,6 +306,7 @@ class Loader
         try {
             $lexer = new Lexer($adapter->getContents($path));
             $parser = new Parser($lexer->tokenize());
+            $parser->setAutoEscape($this->options['autoEscape']);
             $compiler = new Compiler($parser->parse());
         } catch (\Exception $e) {
             $error = $e->getMessage();

@@ -17,6 +17,8 @@ class Parser
     protected $imports;
     protected $autoEscape;
 
+    private $_autoEscape = false;
+
     public function __construct(TokenStream $stream)
     {
         $this->stream = $stream;
@@ -47,6 +49,12 @@ class Parser
         $this->inMacro = false;
         $this->imports = array();
         $this->autoEscape = array(false);
+    }
+
+    public function setAutoEscape($autoEscape)
+    {
+        $this->_autoEscape = $autoEscape;
+        return $this;
     }
 
     public function parse()
@@ -121,7 +129,7 @@ class Parser
                     $token = $this->stream->next();
                     $expr = $this->parseExpression();
                     $autoEscape = $this->autoEscape[count($this->autoEscape) - 1];
-                    if ($autoEscape) {
+                    if ($this->_autoEscape || $autoEscape) {
                         $filters = array();
                         if ($expr instanceof FilterExpression) {
                             if (!$expr->isRaw()) {
