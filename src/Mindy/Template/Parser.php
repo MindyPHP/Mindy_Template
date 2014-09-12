@@ -34,6 +34,7 @@ class Parser
             'continue' => 'parseContinue',
             'extends' => 'parseExtends',
             'comment' => 'parseComment',
+            'spaceless' => 'parseSpaceless',
             'set' => 'parseSet',
             'block' => 'parseBlock',
             'parent' => 'parseParent',
@@ -164,7 +165,7 @@ class Parser
     }
 
     /**
-     * @param \Mindy\Template\Library\Library[] $libraries
+     * @param \Mindy\Template\DefaultLibrary[] $libraries
      * @return $this
      */
     public function setLibraries(array $libraries)
@@ -327,6 +328,18 @@ class Parser
         return null;
     }
 
+    protected function parseSpaceless($token)
+    {
+        if ($this->stream->consume(Token::BLOCK_END)) {
+            $nodeList = $this->subparse('endspaceless');
+            if ($this->stream->next()->getValue() != 'endspaceless') {
+                throw new SyntaxError('malformed spaceless statement', $token);
+            }
+        }
+        $this->stream->expect(Token::BLOCK_END);
+        return new Node\SpacelessNode($nodeList, $token->getLine());
+    }
+
     protected function parseSet($token)
     {
         $attrs = array();
@@ -376,7 +389,7 @@ class Parser
         } else {
             $expr = $this->parseExpression();
             $autoEscape = $this->autoEscape[count($this->autoEscape) - 1];
-            if ($autoEscape) {
+            if ($this->_autoEscape || $autoEscape) {
                 $filters = array();
                 if ($expr instanceof FilterExpression) {
                     if (!$expr->isRaw()) {
