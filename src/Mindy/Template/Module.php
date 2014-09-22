@@ -14,9 +14,9 @@ class Module
     {
         $this->extends = $extends;
         $this->imports = $imports;
-        $this->blocks = $blocks;
-        $this->macros = $macros;
-        $this->body = $body;
+        $this->blocks  = $blocks;
+        $this->macros  = $macros;
+        $this->body    = $body;
     }
 
     public function compile($module, $compiler, $indent = 0)
@@ -24,9 +24,9 @@ class Module
         $class = Loader::CLASS_PREFIX . md5($module);
 
         $compiler->raw("<?php\n");
-        $module_name = trim(preg_replace('/\s\s+/', ' ', $module));
+        $moduleName = trim(preg_replace('/\s\s+/', ' ', $module));
         $compiler->raw(
-            '// ' . $module_name . ' ' . gmdate('Y-m-d H:i:s T', time()) .
+            '// ' . $moduleName . ' ' . gmdate('Y-m-d H:i:s T', time()) .
             "\n", $indent
         );
         $compiler->raw("\nuse \\Mindy\\Template\\Template;\n\n");
@@ -109,7 +109,6 @@ class Module
         $compiler->raw($compiler->getTraceInfo(true) . ";\n");
 
         $compiler->raw("}\n");
-        $compiler->raw('// end of ' . $module_name . "\n");
+        $compiler->raw('// end of ' . $moduleName . "\n");
     }
 }
-
