@@ -8,16 +8,26 @@ use Traversable;
 
 class Helper
 {
-    public static $encoding = 'UTF-8';
+    static $encoding = 'UTF-8';
 
     public static function abs($obj = null)
     {
         return abs(intval($obj));
     }
 
+    public static function slice($obj = null, $start, $length)
+    {
+        if (is_array($obj)) {
+            return array_slice($obj, $start, $length);
+        } elseif (is_string($obj)) {
+            return mb_substr($obj, $start, $length, self::$encoding);
+        }
+        return null;
+    }
+
     public static function bytes($obj = null, $decimals = 1, $dec = '.', $sep = ',')
     {
-        $obj = max(0, intval($obj));
+        $obj    = max(0, intval($obj));
         $places = strlen($obj);
         if ($places <= 9 && $places >= 7) {
             $obj = number_format($obj / 1048576, $decimals, $dec, $sep);
@@ -39,8 +49,8 @@ class Helper
 
     public static function cycle($obj = null)
     {
-        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array)$obj;
-        return new Helper\Cycler((array)$obj);
+        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array) $obj;
+        return new Helper\Cycler((array) $obj);
     }
 
     public static function time($obj = null)
@@ -50,7 +60,7 @@ class Helper
 
     public static function date($obj = null, $format = 'Y-m-d')
     {
-        if(!is_numeric($obj) && is_string($obj)) {
+        if (!is_numeric($obj) && is_string($obj)) {
             $obj = strtotime($obj);
         }
         return date($format, $obj ? $obj : time());
@@ -78,7 +88,7 @@ class Helper
         if (is_string($obj)) {
             return strlen($obj) ? substr($obj, 0, 1) : $default;
         }
-        $obj = $obj instanceof Traversable ? iterator_to_array($obj) : (array)$obj;
+        $obj  = $obj instanceof Traversable ? iterator_to_array($obj) : (array) $obj;
         $keys = array_keys($obj);
         if (count($keys)) {
             return $obj[$keys[0]];
@@ -152,7 +162,7 @@ class Helper
 
     public static function join($obj = null, $glue = '')
     {
-        return join($glue, ($obj instanceof Traversable) ? iterator_to_array($obj) : (array)$obj);
+        return join($glue, ($obj instanceof Traversable) ? iterator_to_array($obj) : (array) $obj);
     }
 
     public static function json_encode($obj = null)
@@ -175,7 +185,7 @@ class Helper
         if (is_string($obj)) {
             return strlen($obj) ? substr($obj, -1) : $default;
         }
-        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array)$obj;
+        $obj  = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array) $obj;
         $keys = array_keys($obj);
         if ($len = count($keys)) {
             return $obj[$keys[$len - 1]];
@@ -186,7 +196,7 @@ class Helper
     public static function length($obj = null)
     {
         if (is_string($obj)) {
-            return mb_strlen((string)$obj, self::$encoding);
+            return mb_strlen((string) $obj, self::$encoding);
         } elseif (is_array($obj) || ($obj instanceof Countable)) {
             return count($obj);
         } elseif ($obj instanceof Traversable) {
@@ -283,4 +293,3 @@ class Helper
         return wordwrap(strval($obj), $width, $break, $cut);
     }
 }
-

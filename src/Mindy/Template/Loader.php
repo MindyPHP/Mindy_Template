@@ -337,13 +337,7 @@ class Loader
 
     public function addHelper($name, $func)
     {
-        if(is_array($func)) {
-            $this->options['helpers'][$name] = function() use ($func) {
-                return call_user_func($func);
-            };
-        } else {
-            $this->options['helpers'][$name] = $func;
-        }
+        $this->options['helpers'][$name] = $func;
         return $this;
     }
 
