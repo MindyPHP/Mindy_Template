@@ -24,8 +24,9 @@ class Module
         $class = Loader::CLASS_PREFIX . md5($module);
 
         $compiler->raw("<?php\n");
+        $module_name = trim(preg_replace('/\s\s+/', ' ', $module));
         $compiler->raw(
-            '// ' . $module . ' ' . gmdate('Y-m-d H:i:s T', time()) .
+            '// ' . $module_name . ' ' . gmdate('Y-m-d H:i:s T', time()) .
             "\n", $indent
         );
         $compiler->raw("\nuse \\Mindy\\Template\\Template;\n\n");
@@ -108,7 +109,7 @@ class Module
         $compiler->raw($compiler->getTraceInfo(true) . ";\n");
 
         $compiler->raw("}\n");
-        $compiler->raw('// end of ' . $module . "\n");
+        $compiler->raw('// end of ' . $module_name . "\n");
     }
 }
 
