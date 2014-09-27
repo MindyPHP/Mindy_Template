@@ -58,7 +58,7 @@ class Helper
         return time();
     }
 
-    public static function date($obj = null, $format = 'Y-m-d')
+    public static function date($obj = null, $format = 'Y-m-d H:m:s')
     {
         if (!is_numeric($obj) && is_string($obj)) {
             $obj = strtotime($obj);
