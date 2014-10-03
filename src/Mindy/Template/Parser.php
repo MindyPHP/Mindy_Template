@@ -43,6 +43,7 @@ class Parser
             'macro' => 'parseMacro',
             'import' => 'parseImport',
             'include' => 'parseInclude',
+            'verbatim' => 'parseVerbatim',
         );
 
         $this->inForLoop = 0;
@@ -338,6 +339,18 @@ class Parser
         }
         $this->stream->expect(Token::BLOCK_END);
         return new Node\SpacelessNode($nodeList, $token->getLine());
+    }
+
+    protected function parseVerbatim($token)
+    {
+        if ($this->stream->consume(Token::BLOCK_END)) {
+            $nodeList = $this->subparse('endverbatim');
+            if ($this->stream->next()->getValue() != 'endverbatim') {
+                throw new SyntaxError('malformed verbatim statement', $token);
+            }
+        }
+        $this->stream->expect(Token::BLOCK_END);
+        return new Node\VerbatimNode($nodeList, $token->getLine());
     }
 
     protected function parseSet($token)

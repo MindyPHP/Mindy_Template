@@ -7,6 +7,9 @@ use Mindy\Template\Node;
 
 class OutputNode extends Node
 {
+    /**
+     * @var \Mindy\Template\NodeList
+     */
     protected $expr;
 
     public function __construct($expr, $line)
