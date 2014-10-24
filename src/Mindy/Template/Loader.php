@@ -128,7 +128,6 @@ class Loader
             throw new \InvalidArgumentException('string expected');
         }
 
-        $source = $this->options['source'];
         $adapter = $this->options['adapter'];
 
         $path = $this->resolvePath($template);
@@ -192,7 +191,6 @@ class Loader
             throw new InvalidArgumentException('string expected');
         }
 
-        $source = $this->options['source'];
         $adapter = $this->options['adapter'];
 
         if (isset($this->paths[$template . $from])) {
@@ -289,12 +287,8 @@ class Loader
             throw new InvalidArgumentException('string expected');
         }
 
-        $source = $this->options['source'];
         $adapter = $this->options['adapter'];
-
         $path = $this->resolvePath($template);
-
-        $class = self::CLASS_PREFIX . md5($path);
 
         if (!$adapter->isReadable($path)) {
             throw new RuntimeException(sprintf(
@@ -307,7 +301,7 @@ class Loader
             $lexer = new Lexer($adapter->getContents($path));
             $parser = new Parser($lexer->tokenize());
             $parser->setAutoEscape($this->options['autoEscape']);
-            $compiler = new Compiler($parser->parse());
+            new Compiler($parser->parse());
         } catch (\Exception $e) {
             $error = $e->getMessage();
             return false;
