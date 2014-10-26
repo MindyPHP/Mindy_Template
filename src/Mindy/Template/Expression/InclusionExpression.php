@@ -9,7 +9,7 @@ class InclusionExpression extends LogicalExpression
     public function compile(Compiler $compiler, $indent = 0)
     {
         $compiler->raw('(is_array(', $indent);
-        $this->left->compile($compiler);
+        $this->right->compile($compiler);
         $compiler->raw(') ? ');
 
             $compiler->raw('(in_array(', $indent);
