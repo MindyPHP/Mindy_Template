@@ -257,14 +257,14 @@ class Helper
 
     public static function truncate($obj = null, $length = 255, $preserve_words = false, $hellip = '&hellip;')
     {
-        $obj = strval($obj);
-        $len = strlen($obj);
+        $obj = (string) $obj;
+        $len = mb_strlen($obj, self::$encoding);
 
         if ($length >= $len) {
             return $obj;
         }
 
-        $truncated = $preserve_words ? preg_replace('/\s+?(\S+)?$/', '', substr($obj, 0, $length + 1)) : substr($obj, 0, $length);
+        $truncated = $preserve_words ? preg_replace('/\s+?(\S+)?$/', '', mb_substr($obj, 0, $length + 1, self::$encoding)) : mb_substr($obj, 0, $length, self::$encoding);
         return $truncated . $hellip;
     }
 
