@@ -255,6 +255,11 @@ class Helper
         return trim(strval($obj), $charlist);
     }
 
+    public static function striptags($obj = null, $allowable_tags = null)
+    {
+        return strip_tags((string)$obj, $allowable_tags);
+    }
+
     public static function truncate($obj = null, $length = 255, $preserve_words = false, $hellip = '&hellip;')
     {
         $obj = (string) $obj;
