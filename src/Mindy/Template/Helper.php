@@ -228,7 +228,7 @@ class Helper
 
     public static function repeat($obj, $times = 2)
     {
-        return str_repeat(strval($obj), $times);
+        return str_repeat((string)$obj, $times);
     }
 
     public static function replace($obj = null, $search = '', $replace = '', $regex = false)
