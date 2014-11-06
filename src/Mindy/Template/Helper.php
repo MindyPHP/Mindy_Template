@@ -206,6 +206,11 @@ class Helper
         }
     }
 
+    public static function is_array($obj = null)
+    {
+        return is_array($obj);
+    }
+
     public static function lower($obj = null)
     {
         return mb_strtolower(strval($obj), self::$encoding);
