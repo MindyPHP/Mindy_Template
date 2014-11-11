@@ -249,9 +249,9 @@ class Parser
         $this->stream->expect(Token::OPERATOR, 'in');
         $seq = $this->parseExpression();
         $this->stream->expect(Token::BLOCK_END);
-        $body = $this->subparse(array('else', 'endfor'));
+        $body = $this->subparse(array('else', 'empty', 'endfor'));
         $this->inForLoop--;
-        if ($this->stream->getCurrentToken()->getValue() == 'else') {
+        if (in_array($this->stream->getCurrentToken()->getValue(), ['empty', 'else'])) {
             $this->stream->next();
             $this->stream->expect(Token::BLOCK_END);
             $else = $this->subparse('endfor');
