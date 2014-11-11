@@ -47,6 +47,8 @@ class ForNode extends Node
 
         // Django template engine compatible
         // Twig template engine compatible
+        $compiler->raw('$i = 0;');
+        $compiler->raw("\n");
         $compiler->raw('foreach (($context[\'forloop\'] = $context[\'loop\'] = $this->iterate($context, ',
             $else ? ($indent + 1) : $indent);
         $this->seq->compile($compiler);
@@ -62,7 +64,15 @@ class ForNode extends Node
             );
         }
 
+        $compiler->raw('$context[\'counter0\'] = $context[\'index0\'] = $i;');
+        $compiler->raw("\n");
+        $compiler->raw('$context[\'counter\'] = $context[\'index\'] = $i + 1;');
+        $compiler->raw("\n");
+
         $this->body->compile($compiler, $else ? ($indent + 2) : ($indent + 1));
+
+        $compiler->raw('$i++;');
+        $compiler->raw("\n");
 
         $compiler->raw("}\n", $else ? ($indent + 1) : $indent);
 
