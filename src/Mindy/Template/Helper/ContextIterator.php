@@ -12,9 +12,43 @@ class ContextIterator implements Iterator
 {
     protected $sequence;
 
+    /**
+     * @var int twig compatibility
+     */
+    public $index;
+    /**
+     * @var int twig compatibility
+     */
+    public $index0;
+    /**
+     * @var int twig compatibility
+     */
+    public $revindex;
+    /**
+     * @var int twig compatibility
+     */
+    public $revindex0;
+
+    /**
+     * @var int django compatibility
+     */
+    public $counter;
+    /**
+     * @var int django compatibility
+     */
+    public $counter0;
+    /**
+     * @var int django compatibility
+     */
+    public $revcounter;
+    /**
+     * @var int django compatibility
+     */
+    public $revcounter0;
+
     public function __construct($sequence, $parent)
     {
-        if($sequence instanceof IteratorAggregate) {
+        if ($sequence instanceof IteratorAggregate) {
             $this->length = ($sequence instanceof Countable) ? count($sequence) : iterator_count($sequence);
             $this->sequence = $sequence->getIterator();
         } elseif ($sequence instanceof Traversable) {
@@ -34,10 +68,13 @@ class ContextIterator implements Iterator
     {
         $this->sequence->rewind();
 
-        $this->index = 0;
-        $this->count = $this->index + 1;
-        $this->first = $this->count == 1;
-        $this->last  = $this->count == $this->length;
+        $this->index0 = $this->counter0 = 0;
+        $this->counter = $this->index = $this->index0 + 1;
+        $this->first = $this->counter == 1;
+        $this->last = $this->counter == $this->length;
+
+        $this->revcounter0 = $this->revindex0 = $this->length - 1;
+        $this->revcounter = $this->revindex = $this->length;
     }
 
     public function key()
@@ -54,10 +91,13 @@ class ContextIterator implements Iterator
     {
         $this->sequence->next();
 
-        $this->index += 1;
-        $this->count  = $this->index + 1;
-        $this->first  = $this->count == 1;
-        $this->last   = $this->count == $this->length;
+        $this->index0 = $this->counter0 += 1;
+        $this->counter = $this->index += 1;
+        $this->first = $this->counter == 1;
+        $this->last = $this->counter == $this->length;
+
+        $this->revcounter0 = $this->revindex0 -= 1;
+        $this->revcounter = $this->revindex -= 1;
     }
 
     public function current()

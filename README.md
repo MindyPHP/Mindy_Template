@@ -564,7 +564,7 @@ the optional `else` clause to implicitly branch if no iteration occurs:
     {% endfor %}
 
 Empty arrays or iterators, and values other than arrays or iterators will branch
-to the `else` clause.
+to the `else` or `empty` clause.
 
 You can also iterate as key and value pairs by using a comma:
 
@@ -587,8 +587,10 @@ scope inside the `for` block.
 
 The special `loop` variable has a few attributes:
 
-- `loop.index`: The zero-based index.
-- `loop.count`: The one-based index.
+- `loop.counter0`, `loop.index0`: The zero-based index.
+- `loop.counter`, `loop.index`: The one-based index.
+- `loop.revindex0`: The zero-based reverse index.
+- `loop.revindex`: The one-based reverse index
 - `loop.first`: Evaluates to `true` if the current iteration is the first.
 - `loop.last`: Evaluates to `true` if the current iteration is the last.
 - `loop.parent`: The parent iteration `loop` object if applicable.
