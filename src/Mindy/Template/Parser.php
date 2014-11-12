@@ -186,7 +186,7 @@ class Parser
         $line = $token->getLine();
         $expr = $this->parseExpression();
         $this->stream->expect(Token::BLOCK_END);
-        $body = $this->subparse(array('elseif', 'else', 'endif'));
+        $body = $this->subparse(array('elseif', 'elif', 'else', 'endif'));
         $tests = array(array($expr, $body));
         $else = null;
 
@@ -194,9 +194,10 @@ class Parser
         while (!$end) {
             switch ($this->stream->next()->getValue()) {
                 case 'elseif':
+                case 'elif':
                     $expr = $this->parseExpression();
                     $this->stream->expect(Token::BLOCK_END);
-                    $body = $this->subparse(array('elseif', 'else', 'endif'));
+                    $body = $this->subparse(array('elseif', 'elif', 'else', 'endif'));
                     $tests[] = array($expr, $body);
                     break;
                 case 'else':
@@ -641,17 +642,17 @@ class Parser
         $line = $this->stream->getCurrentToken()->getLine();
         $left = $this->parseJoinExpression();
         while ($this->stream->consume(Token::OPERATOR, '~')) {
-            $right = $this->parseJoinExpression();
+            $right = $this->parseJoinExpression(1);
             $left = new Expression\ConcatExpression($left, $right, $line);
             $line = $this->stream->getCurrentToken()->getLine();
         }
         return $left;
     }
 
-    protected function parseJoinExpression()
+    protected function parseJoinExpression($q = null)
     {
         $line = $this->stream->getCurrentToken()->getLine();
-        $left = $this->parseAddExpression();
+        $left = $this->parseAddExpression($q = null);
         while ($this->stream->consume(Token::OPERATOR, '..')) {
             $right = $this->parseAddExpression();
             $left = new Expression\JoinExpression($left, $right, $line);
@@ -660,10 +661,10 @@ class Parser
         return $left;
     }
 
-    protected function parseAddExpression()
+    protected function parseAddExpression($q = null)
     {
         $line = $this->stream->getCurrentToken()->getLine();
-        $left = $this->parseSubExpression();
+        $left = $this->parseSubExpression($q = null);
         while ($this->stream->consume(Token::OPERATOR, '+')) {
             $right = $this->parseSubExpression();
             $left = new Expression\AddExpression($left, $right, $line);
@@ -672,10 +673,13 @@ class Parser
         return $left;
     }
 
-    protected function parseSubExpression()
+    protected function parseSubExpression($q = null)
     {
         $line = $this->stream->getCurrentToken()->getLine();
-        $left = $this->parseMulExpression();
+        $left = $this->parseMulExpression($q = null);
+        if($q) {
+            d($left);
+        }
         while ($this->stream->consume(Token::OPERATOR, '-')) {
             $right = $this->parseMulExpression();
             $left = new Expression\SubExpression($left, $right, $line);
@@ -684,7 +688,7 @@ class Parser
         return $left;
     }
 
-    protected function parseMulExpression()
+    protected function parseMulExpression($q = null)
     {
         $line = $this->stream->getCurrentToken()->getLine();
         $left = $this->parseDivExpression();
