@@ -138,17 +138,10 @@ abstract class Template
         $args = func_get_args();
         $name = array_shift($args);
 
-        try {
-            if (isset($this->helpers[$name]) && is_callable($this->helpers[$name])) {
-                return call_user_func_array($this->helpers[$name], $args);
-            }
-
-            $helper = array($this->helperClassName, $name);
-            if (is_callable($helper)) {
-                return call_user_func_array($helper, $args);
-            }
-        } catch (Exception $e) {
-            throw new RuntimeException(sprintf('%s in %s line %d', $e->getMessage(), static::NAME, $this->getLineTrace($e)));
+        if (isset($this->helpers[$name]) && is_callable($this->helpers[$name])) {
+            return call_user_func_array($this->helpers[$name], $args);
+        } else if (($helper = array($this->helperClassName, $name)) && is_callable($helper)) {
+            return call_user_func_array($helper, $args);
         }
 
         throw new RuntimeException(sprintf('undefined helper "%s" in %s line %d', $name, static::NAME, $this->getLineTrace()));
