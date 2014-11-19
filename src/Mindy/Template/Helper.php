@@ -71,6 +71,11 @@ class Helper
         return date($format, $obj ? $obj : time());
     }
 
+    public static function strtotime($obj = null)
+    {
+        return (string)$obj;
+    }
+
     public static function dump($obj = null)
     {
         echo '<pre>';
