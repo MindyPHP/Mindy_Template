@@ -312,4 +312,17 @@ class Helper
     {
         return wordwrap(strval($obj), $width, $break, $cut);
     }
+
+    public static function round($obj = null, $precision = 0, $type = 'common')
+    {
+        switch ($type) {
+            case 'ceil':
+                return ceil($obj);
+                break;
+            case 'floor':
+                return floor($obj);
+                break;
+        }
+        return round($obj, $precision);
+    }
 }
