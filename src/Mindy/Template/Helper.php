@@ -325,4 +325,9 @@ class Helper
         }
         return round($obj, $precision);
     }
+
+    public static function toint($obj = null)
+    {
+        return (int) $obj;
+    }
 }
