@@ -48,7 +48,7 @@ class Helper
 
     public static function capitalize($obj)
     {
-        $str = strval($obj);
+        $str = (string)$obj;
         return mb_strtoupper(mb_substr($str, 0, 1, self::$encoding), self::$encoding) . mb_strtolower(mb_substr($str, 1, mb_strlen($str), self::$encoding), self::$encoding);
     }
 
@@ -90,7 +90,7 @@ class Helper
 
     public static function escape($obj = null, $force = false)
     {
-        return htmlspecialchars(strval($obj), ENT_QUOTES, self::$encoding, $force);
+        return htmlspecialchars((string)$obj, ENT_QUOTES, self::$encoding, $force);
     }
 
     public static function first($obj = null, $default = null)
@@ -223,17 +223,12 @@ class Helper
 
     public static function lower($obj = null)
     {
-        return mb_strtolower(strval($obj), self::$encoding);
+        return mb_strtolower((string)$obj, self::$encoding);
     }
 
     public static function nl2br($obj = null, $is_xhtml = false)
     {
-        return nl2br(strval($obj), $is_xhtml);
-    }
-
-    public static function number_format($obj = null, $decimals = 0, $dec_point = '.', $thousands_sep = ',')
-    {
-        return number_format(strval($obj), $decimals, $dec_point, $thousands_sep);
+        return nl2br((string)$obj, $is_xhtml);
     }
 
     public static function range($lower = null, $upper = null, $step = 1)
@@ -249,25 +244,25 @@ class Helper
     public static function replace($obj = null, $search = '', $replace = '', $regex = false)
     {
         if ($regex) {
-            return preg_replace($search, $replace, strval($obj));
+            return preg_replace($search, $replace, (string)$obj);
         } else {
-            return str_replace($search, $replace, strval($obj));
+            return str_replace($search, $replace, (string)$obj);
         }
     }
 
     public static function strip_tags($obj = null, $allowableTags = '')
     {
-        return strip_tags(strval($obj), $allowableTags);
+        return strip_tags((string)$obj, $allowableTags);
     }
 
     public static function title($obj = null)
     {
-        return ucwords(strval($obj));
+        return ucwords((string)$obj);
     }
 
     public static function trim($obj = null, $charlist = " \t\n\r\0\x0B")
     {
-        return trim(strval($obj), $charlist);
+        return trim((string)$obj, $charlist);
     }
 
     public static function striptags($obj = null, $allowable_tags = null)
@@ -290,7 +285,7 @@ class Helper
 
     public static function unescape($obj = null)
     {
-        return htmlspecialchars_decode(strval($obj), ENT_QUOTES);
+        return htmlspecialchars_decode((string)$obj, ENT_QUOTES);
     }
 
     public static function chunk($obj = null, $by)
@@ -300,17 +295,17 @@ class Helper
 
     public static function upper($obj = null)
     {
-        return mb_strtoupper(strval($obj), self::$encoding);
+        return mb_strtoupper((string)$obj, self::$encoding);
     }
 
     public static function url_encode($obj = null)
     {
-        return urlencode(strval($obj));
+        return urlencode((string)$obj);
     }
 
     public static function word_wrap($obj = null, $width = 75, $break = "\n", $cut = false)
     {
-        return wordwrap(strval($obj), $width, $break, $cut);
+        return wordwrap((string)$obj, $width, $break, $cut);
     }
 
     public static function round($obj = null, $precision = 0, $type = 'common')

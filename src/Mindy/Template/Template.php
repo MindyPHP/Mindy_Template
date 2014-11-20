@@ -9,13 +9,44 @@ use RuntimeException;
 
 abstract class Template
 {
+    /**
+     * @var string
+     */
     public $helperClassName = '\Mindy\Template\Helper';
+    /**
+     * @var array
+     */
+    public $internalHelpers = [
+        'is_array',
+        'number_format'
+    ];
+    /**
+     * @var Loader
+     */
     protected $loader;
+    /**
+     * @var array
+     */
     protected $helpers;
+    /**
+     * @var null
+     */
     protected $parent;
+    /**
+     * @var array
+     */
     protected $blocks;
+    /**
+     * @var array
+     */
     protected $macros;
+    /**
+     * @var array
+     */
     protected $imports;
+    /**
+     * @var array
+     */
     protected $stack;
 
     public function __construct(Loader $loader, $helpers = array())
@@ -133,6 +164,12 @@ abstract class Template
         return null;
     }
 
+    /**
+     * @param $name
+     * @param array $args
+     * @return mixed
+     * @throws \RuntimeException
+     */
     public function helper($name, $args = array())
     {
         $args = func_get_args();
@@ -142,13 +179,32 @@ abstract class Template
             return call_user_func_array($this->helpers[$name], $args);
         } else if (($helper = array($this->helperClassName, $name)) && is_callable($helper)) {
             return call_user_func_array($helper, $args);
+        } else if (function_exists($name) && in_array($name, $this->internalHelpers)) {
+            if (isset($args[0])) {
+                $args[0] = (string)$args[0];
+            }
+            return call_user_func_array($name, $args);
         }
 
         throw new RuntimeException(sprintf('undefined helper "%s" in %s line %d', $name, static::NAME, $this->getLineTrace()));
     }
 
+    /**
+     * @param array $context
+     * @param array $blocks
+     * @param array $macros
+     * @param array $imports
+     * @return string
+     */
     abstract public function display($context = array(), $blocks = array(), $macros = array(), $imports = array());
 
+    /**
+     * @param array $context
+     * @param array $blocks
+     * @param array $macros
+     * @param array $imports
+     * @return string
+     */
     public function render($context = array(), $blocks = array(), $macros = array(), $imports = array())
     {
         ob_start();
