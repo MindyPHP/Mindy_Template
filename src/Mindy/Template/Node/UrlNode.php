@@ -1,9 +1,9 @@
 <?php
 /**
- * 
+ *
  *
  * All rights reserved.
- * 
+ *
  * @author Falaleev Maxim
  * @email max@studio107.ru
  * @version 1.0
@@ -37,7 +37,7 @@ class UrlNode extends Node
     {
         $compiler->addTraceInfo($this, $indent);
 
-        if($this->name) {
+        if ($this->name) {
             $name = "\$context['$this->name']";
             $compiler->raw("if (!isset($name)) $name = null;\n" . "\n", $indent);
             $compiler->raw("\$this->setAttr($name, array(), ", $indent);
@@ -57,12 +57,12 @@ class UrlNode extends Node
         $this->route->compile($compiler);
         $compiler->raw(', ');
 
-        if($this->params instanceof ArrayExpression) {
+        if ($this->params instanceof ArrayExpression) {
             $this->params->compile($compiler);
         } else {
             $compiler->raw('array(');
             foreach ($this->params as $key => $expression) {
-                if(is_string($key)) {
+                if (is_string($key)) {
                     $compiler->raw("'$key'", 1);
                 } else {
                     $expression->compile($compiler, 1);
