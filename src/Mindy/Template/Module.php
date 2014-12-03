@@ -24,7 +24,7 @@ class Module
         $class = Loader::CLASS_PREFIX . md5($module);
 
         $compiler->raw("<?php\n");
-        $moduleName = trim(preg_replace('/\s\s+/', ' ', $module));
+        $moduleName = trim(preg_replace('/(\s\s+|[\n\r])/', ' ', $module));
         $compiler->raw(
             '// ' . $moduleName . ' ' . gmdate('Y-m-d H:i:s T', time()) .
             "\n", $indent
