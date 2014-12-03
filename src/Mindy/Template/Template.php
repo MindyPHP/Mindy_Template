@@ -62,6 +62,9 @@ abstract class Template
 
     public function loadExtends($template)
     {
+        if ($template == static::NAME) {
+            throw new Exception("Template cannot be inherited from himself: " . static::NAME);
+        }
         try {
             return $this->loader->load($template, static::NAME);
         } catch (Exception $e) {
