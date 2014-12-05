@@ -20,8 +20,17 @@ class Loader
      * @var array
      */
     protected $options = array();
-    protected $paths;
-    protected $cache;
+    /**
+     * @var array
+     */
+    protected $paths = array();
+    /**
+     * @var array
+     */
+    protected $cache = array();
+    /**
+     * @var array
+     */
     protected $libraries = array();
 
     public static function autoload()
@@ -87,6 +96,22 @@ class Loader
         $this->cache = array();
 
         $this->addLibrary(new DefaultLibrary);
+
+        set_exception_handler(array(&$this, 'handleSyntaxError'));
+    }
+
+    public function handleSyntaxError($exception)
+    {
+        if ($exception instanceof SyntaxError) {
+            $adapter = $this->options['adapter'];
+            echo $this->renderString(file_get_contents(__DIR__ . '/templates/debug.html'), [
+                'exception' => $exception,
+                'source' => $adapter->getContents($exception->getTemplateFile()),
+                'styles' => file_get_contents(__DIR__ . '/templates/core.css') . file_get_contents(__DIR__ . '/templates/exception.css'),
+                'loader' => $this
+            ]);
+            die();
+        }
     }
 
     public function normalizePath($path)
@@ -103,6 +128,11 @@ class Loader
         return $parts;
     }
 
+    /**
+     * @param $template
+     * @param string $from
+     * @return string
+     */
     public function resolvePath($template, $from = '')
     {
         foreach ($this->options['source'] as $sourcePath) {
@@ -166,6 +196,7 @@ class Loader
                 $compiler = new Compiler($parser->parse());
                 $compiler->compile($path, $target);
             } catch (SyntaxError $e) {
+                $e->setTemplateFile($path);
                 throw $e->setMessage($path . ': ' . $e->getMessage());
             }
         }
@@ -236,6 +267,7 @@ class Loader
                     $compiler = new Compiler($parser->parse());
                     $compiler->compile($path, $target);
                 } catch (SyntaxError $e) {
+                    $e->setTemplateFile($path);
                     throw $e->setMessage($path . ': ' . $e->getMessage());
                 }
             }
@@ -274,6 +306,7 @@ class Loader
             $compiler = new Compiler($parser->parse());
             $compiler->compile($template, $target);
         } catch (SyntaxError $e) {
+            $e->setTemplateFile($path);
             throw $e->setMessage($path . ': ' . $e->getMessage());
         }
         require_once $target;
@@ -342,5 +375,10 @@ class Loader
             $this->addHelper($name, $func);
         }
         return $this;
+    }
+
+    public function getVersion()
+    {
+        return 1.0;
     }
 }

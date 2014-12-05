@@ -6,19 +6,54 @@ use Mindy\Template\Expression\FilterExpression;
 
 class Parser
 {
+    /**
+     * @var TokenStream
+     */
     protected $stream;
+    /**
+     * @var null
+     */
     protected $extends;
+    /**
+     * @var array
+     */
     protected $blocks;
+    /**
+     * @var array
+     */
     protected $currentBlock;
+    /**
+     * @var array
+     */
     protected $tags;
+    /**
+     * @var int
+     */
     protected $inForLoop;
+    /**
+     * @var array
+     */
     protected $macros;
+    /**
+     * @var bool
+     */
     protected $inMacro;
+    /**
+     * @var array
+     */
     protected $imports;
+    /**
+     * @var array
+     */
     protected $autoEscape;
-
+    /**
+     * @var bool
+     */
     private $_autoEscape = false;
 
+    /**
+     * @param TokenStream $stream
+     */
     public function __construct(TokenStream $stream)
     {
         $this->stream = $stream;
@@ -108,12 +143,12 @@ class Parser
                     }
                     $this->stream->next();
                     if (isset($this->tags[$token->getValue()])) {
-                        if(is_callable(array($this, $this->tags[$token->getValue()]))) {
+                        if (is_callable(array($this, $this->tags[$token->getValue()]))) {
                             $node = call_user_func(array($this, $this->tags[$token->getValue()]), $token);
                         } else {
-                            foreach($this->libraries as $library) {
+                            foreach ($this->libraries as $library) {
                                 $tags = $library->getTags();
-                                if(array_key_exists($token->getValue(), $tags)) {
+                                if (array_key_exists($token->getValue(), $tags)) {
                                     $node = call_user_func(array($library, $tags[$token->getValue()]), $token);
                                     break;
                                 }
@@ -172,7 +207,7 @@ class Parser
     public function setLibraries(array $libraries)
     {
         $this->libraries = $libraries;
-        foreach($libraries as $library) {
+        foreach ($libraries as $library) {
             $library->setParser($this);
             $library->setStream($this->stream);
 
@@ -677,7 +712,7 @@ class Parser
     {
         $line = $this->stream->getCurrentToken()->getLine();
         $left = $this->parseMulExpression($q = null);
-        if($q) {
+        if ($q) {
             d($left);
         }
         while ($this->stream->consume(Token::OPERATOR, '-')) {
