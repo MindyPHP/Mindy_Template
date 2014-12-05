@@ -96,22 +96,18 @@ class Loader
         $this->cache = array();
 
         $this->addLibrary(new DefaultLibrary);
-
-        set_exception_handler(array(&$this, 'handleSyntaxError'));
     }
 
-    public function handleSyntaxError($exception)
+    protected function handleSyntaxError($exception)
     {
-        if ($exception instanceof SyntaxError) {
-            $adapter = $this->options['adapter'];
-            echo $this->renderString(file_get_contents(__DIR__ . '/templates/debug.html'), [
-                'exception' => $exception,
-                'source' => $adapter->getContents($exception->getTemplateFile()),
-                'styles' => file_get_contents(__DIR__ . '/templates/core.css') . file_get_contents(__DIR__ . '/templates/exception.css'),
-                'loader' => $this
-            ]);
-            die();
-        }
+        $adapter = $this->options['adapter'];
+        echo $this->renderString(file_get_contents(__DIR__ . '/templates/debug.html'), [
+            'exception' => $exception,
+            'source' => $adapter->getContents($exception->getTemplateFile()),
+            'styles' => file_get_contents(__DIR__ . '/templates/core.css') . file_get_contents(__DIR__ . '/templates/exception.css'),
+            'loader' => $this
+        ]);
+        die();
     }
 
     public function normalizePath($path)
@@ -197,7 +193,7 @@ class Loader
                 $compiler->compile($path, $target);
             } catch (SyntaxError $e) {
                 $e->setTemplateFile($path);
-                throw $e->setMessage($path . ': ' . $e->getMessage());
+                $this->handleSyntaxError($e->setMessage($path . ': ' . $e->getMessage()));
             }
         }
 
@@ -268,7 +264,7 @@ class Loader
                     $compiler->compile($path, $target);
                 } catch (SyntaxError $e) {
                     $e->setTemplateFile($path);
-                    throw $e->setMessage($path . ': ' . $e->getMessage());
+                    $this->handleSyntaxError($e->setMessage($path . ': ' . $e->getMessage()));
                 }
             }
             require_once $target;
@@ -307,7 +303,7 @@ class Loader
             $compiler->compile($template, $target);
         } catch (SyntaxError $e) {
             $e->setTemplateFile($path);
-            throw $e->setMessage($path . ': ' . $e->getMessage());
+            $this->handleSyntaxError($e->setMessage($path . ': ' . $e->getMessage()));
         }
         require_once $target;
 
