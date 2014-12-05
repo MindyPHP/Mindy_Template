@@ -326,9 +326,9 @@ abstract class Template
         }
     }
 
-    public static function toint($obj=null, $value){
+    public static function toint($obj = null, $value)
+    {
         return (int)$value;
-
     }
 }
 
