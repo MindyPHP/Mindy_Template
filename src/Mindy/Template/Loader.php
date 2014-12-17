@@ -4,8 +4,6 @@ namespace Mindy\Template;
 
 use InvalidArgumentException;
 use Mindy\Template\Adapter\FileAdapter;
-use Mindy\Template\DefaultLibrary;
-use Mindy\Template\Library;
 use RuntimeException;
 
 class Loader
@@ -15,6 +13,10 @@ class Loader
     const RECOMPILE_NEVER = -1;
     const RECOMPILE_NORMAL = 0;
     const RECOMPILE_ALWAYS = 1;
+    /**
+     * @var bool enable exception handler
+     */
+    public $exceptionHandler = true;
 
     /**
      * @var array
@@ -100,14 +102,18 @@ class Loader
 
     protected function handleSyntaxError($exception)
     {
-        $adapter = $this->options['adapter'];
-        echo $this->renderString(file_get_contents(__DIR__ . '/templates/debug.html'), [
-            'exception' => $exception,
-            'source' => $adapter->getContents($exception->getTemplateFile()),
-            'styles' => file_get_contents(__DIR__ . '/templates/core.css') . file_get_contents(__DIR__ . '/templates/exception.css'),
-            'loader' => $this
-        ]);
-        die();
+        if ($this->exceptionHandler) {
+            $adapter = $this->options['adapter'];
+            echo $this->renderString(file_get_contents(__DIR__ . '/templates/debug.html'), [
+                'exception' => $exception,
+                'source' => $adapter->getContents($exception->getTemplateFile()),
+                'styles' => file_get_contents(__DIR__ . '/templates/core.css') . file_get_contents(__DIR__ . '/templates/exception.css'),
+                'loader' => $this
+            ]);
+            die();
+        } else {
+            throw $exception;
+        }
     }
 
     public function normalizePath($path)
@@ -134,7 +140,7 @@ class Loader
         foreach ($this->options['source'] as $sourcePath) {
             $source = implode('/', $this->normalizePath($sourcePath));
             $file = $source . '/' . ltrim($template, '/');
-            if(is_file($file)) {
+            if (is_file($file)) {
                 $parts = $this->normalizePath($source . '/' . dirname($from) . '/' . $template);
                 foreach ($this->normalizePath($source) as $i => $part) {
                     if ($part !== $parts[$i]) {
@@ -367,7 +373,7 @@ class Loader
     public function addLibrary(Library $library)
     {
         $this->libraries[] = $library;
-        foreach($library->getHelpers() as $name => $func) {
+        foreach ($library->getHelpers() as $name => $func) {
             $this->addHelper($name, $func);
         }
         return $this;
