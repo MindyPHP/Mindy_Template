@@ -325,4 +325,9 @@ class Helper
     {
         return (int) $obj;
     }
+
+    public static function has_key($obj = null, $key)
+    {
+        return array_key_exists($key, (array)$obj);
+    }
 }
