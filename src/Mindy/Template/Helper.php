@@ -330,4 +330,9 @@ class Helper
     {
         return array_key_exists($key, (array)$obj);
     }
+
+    public static function call($obj = null, $method, array $args = [])
+    {
+        return call_user_func_array([$obj, $method], $args);
+    }
 }
