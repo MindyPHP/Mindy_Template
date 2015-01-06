@@ -19,7 +19,8 @@ abstract class Template
     public $internalHelpers = [
         'is_array',
         'number_format',
-        'nl2br'
+        'nl2br',
+        'substr_count'
     ];
     /**
      * @var Loader
