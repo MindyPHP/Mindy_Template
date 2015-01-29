@@ -2,6 +2,7 @@
     "name": "mindy/template",
     "description": "Fast PHP templating engine",
     "keywords": ["template", "templating"],
+    "version": "1.0.3",
     "type": "library",
     "license": "MIT",
     "authors": [
