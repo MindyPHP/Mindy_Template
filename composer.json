@@ -5,16 +5,18 @@
     "version": "1.0.3",
     "type": "library",
     "license": "MIT",
-    "authors": [
-        {
-            "name": "Falaleev Maxim",
-            "email": "max@studio107.ru"
-        },
-        {
-            "name": "Nofriandi Ramenta",
-            "email": "nramenta@gmail.com"
+    "autoload": {
+        "psr-4": {
+            "Mindy\\Template\\": "src/Mindy/Template"
         }
-    ],
+    },
+    "authors": [{
+        "name": "Falaleev Maxim",
+        "email": "max@studio107.ru"
+    }, {
+        "name": "Nofriandi Ramenta",
+        "email": "nramenta@gmail.com"
+    }],
     "require": {
         "php": ">=5.3.0"
     },
