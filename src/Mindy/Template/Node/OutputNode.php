@@ -5,6 +5,10 @@ namespace Mindy\Template\Node;
 use Mindy\Template\Compiler;
 use Mindy\Template\Node;
 
+/**
+ * Class OutputNode
+ * @package Mindy\Template
+ */
 class OutputNode extends Node
 {
     /**

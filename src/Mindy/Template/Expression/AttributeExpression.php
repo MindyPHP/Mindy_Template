@@ -5,6 +5,10 @@ namespace Mindy\Template\Expression;
 use Mindy\Template\Compiler;
 use Mindy\Template\Expression;
 
+/**
+ * Class AttributeExpression
+ * @package Mindy\Template
+ */
 class AttributeExpression extends Expression
 {
     protected $node;

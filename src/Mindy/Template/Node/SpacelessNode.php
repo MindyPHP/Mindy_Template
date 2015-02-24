@@ -5,6 +5,10 @@ namespace Mindy\Template\Node;
 use Mindy\Template\Compiler;
 use Mindy\Template\Node;
 
+/**
+ * Class SpacelessNode
+ * @package Mindy\Template
+ */
 class SpacelessNode extends OutputNode
 {
     public function compile(Compiler $compiler, $indent = 0)

@@ -5,6 +5,10 @@ namespace Mindy\Template\Node;
 use Mindy\Template\Compiler;
 use Mindy\Template\Node;
 
+/**
+ * Class IfNode
+ * @package Mindy\Template
+ */
 class IfNode extends Node
 {
     protected $tests;

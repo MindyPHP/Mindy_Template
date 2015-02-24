@@ -5,6 +5,10 @@ namespace Mindy\Template\Node;
 use Mindy\Template\Compiler;
 use Mindy\Template\Node;
 
+/**
+ * Class TextNode
+ * @package Mindy\Template
+ */
 class TextNode extends Node
 {
     protected $data;

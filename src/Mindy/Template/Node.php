@@ -2,6 +2,10 @@
 
 namespace Mindy\Template;
 
+/**
+ * Class Node
+ * @package Mindy\Template
+ */
 class Node
 {
     protected $line;

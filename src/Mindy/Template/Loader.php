@@ -6,6 +6,10 @@ use InvalidArgumentException;
 use Mindy\Template\Adapter\FileAdapter;
 use RuntimeException;
 
+/**
+ * Class Loader
+ * @package Mindy\Template
+ */
 class Loader
 {
     const CLASS_PREFIX = '__MindyTemplate_';

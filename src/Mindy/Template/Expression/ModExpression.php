@@ -4,6 +4,10 @@ namespace Mindy\Template\Expression;
 
 use Mindy\Template\Compiler;
 
+/**
+ * Class ModExpression
+ * @package Mindy\Template
+ */
 class ModExpression extends BinaryExpression
 {
     public function compile(Compiler $compiler, $indent = 0)

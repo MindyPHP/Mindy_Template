@@ -6,6 +6,10 @@ use Mindy\Template\Compiler;
 use Mindy\Template\Expression\ArrayExpression;
 use Mindy\Template\Node;
 
+/**
+ * Class ExtendsNode
+ * @package Mindy\Template
+ */
 class ExtendsNode extends Node
 {
     protected $parent;

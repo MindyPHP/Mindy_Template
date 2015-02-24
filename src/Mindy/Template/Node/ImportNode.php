@@ -5,6 +5,10 @@ namespace Mindy\Template\Node;
 use Mindy\Template\Compiler;
 use Mindy\Template\Node;
 
+/**
+ * Class ImportNode
+ * @package Mindy\Template
+ */
 class ImportNode extends Node
 {
     protected $module;

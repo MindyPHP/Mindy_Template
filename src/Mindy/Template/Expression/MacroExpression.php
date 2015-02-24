@@ -5,6 +5,10 @@ namespace Mindy\Template\Expression;
 use Mindy\Template\Compiler;
 use Mindy\Template\Expression;
 
+/**
+ * Class MacroExpression
+ * @package Mindy\Template
+ */
 class MacroExpression extends Expression
 {
     protected $module;

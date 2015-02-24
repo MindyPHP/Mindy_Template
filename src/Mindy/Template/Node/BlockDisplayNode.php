@@ -5,6 +5,10 @@ namespace Mindy\Template\Node;
 use Mindy\Template\Compiler;
 use Mindy\Template\Node;
 
+/**
+ * Class BlockDisplayNode
+ * @package Mindy\Template
+ */
 class BlockDisplayNode extends Node
 {
     protected $name;

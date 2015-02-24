@@ -2,6 +2,10 @@
 
 namespace Mindy\Template;
 
+/**
+ * Class Module
+ * @package Mindy\Template
+ */
 class Module
 {
     protected $extends;

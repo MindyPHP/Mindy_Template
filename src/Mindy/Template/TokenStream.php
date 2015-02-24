@@ -2,6 +2,10 @@
 
 namespace Mindy\Template;
 
+/**
+ * Class TokenStream
+ * @package Mindy\Template
+ */
 class TokenStream
 {
     protected $tokens;

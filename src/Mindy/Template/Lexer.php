@@ -2,6 +2,10 @@
 
 namespace Mindy\Template;
 
+/**
+ * Class Lexer
+ * @package Mindy\Template
+ */
 class Lexer
 {
     protected $source;

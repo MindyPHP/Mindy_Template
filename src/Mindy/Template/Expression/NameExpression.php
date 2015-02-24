@@ -5,6 +5,10 @@ namespace Mindy\Template\Expression;
 use Mindy\Template\Compiler;
 use Mindy\Template\Expression;
 
+/**
+ * Class NameExpression
+ * @package Mindy\Template
+ */
 class NameExpression extends Expression
 {
     protected $name;

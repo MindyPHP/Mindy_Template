@@ -5,6 +5,10 @@ namespace Mindy\Template\Node;
 use Mindy\Template\Compiler;
 use Mindy\Template\Node;
 
+/**
+ * Class ParentNode
+ * @package Mindy\Template
+ */
 class ParentNode extends Node
 {
     protected $name;

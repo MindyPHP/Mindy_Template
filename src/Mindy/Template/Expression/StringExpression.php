@@ -5,6 +5,10 @@ namespace Mindy\Template\Expression;
 use Mindy\Template\Compiler;
 use Mindy\Template\Expression;
 
+/**
+ * Class StringExpression
+ * @package Mindy\Template
+ */
 class StringExpression extends Expression
 {
     protected $value;

@@ -5,6 +5,10 @@ namespace Mindy\Template\Expression;
 use Mindy\Template\Compiler;
 use Mindy\Template\Expression;
 
+/**
+ * Class BinaryExpression
+ * @package Mindy\Template
+ */
 class BinaryExpression extends Expression
 {
     protected $left;

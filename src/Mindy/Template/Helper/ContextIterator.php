@@ -8,6 +8,10 @@ use Iterator;
 use IteratorAggregate;
 use Traversable;
 
+/**
+ * Class ContextIterator
+ * @package Mindy\Template
+ */
 class ContextIterator implements Iterator
 {
     protected $sequence;

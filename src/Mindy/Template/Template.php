@@ -7,6 +7,10 @@ use Exception;
 use Mindy\Template\Helper;
 use RuntimeException;
 
+/**
+ * Class Template
+ * @package Mindy\Template
+ */
 abstract class Template
 {
     /**

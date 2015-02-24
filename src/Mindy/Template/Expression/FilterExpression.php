@@ -5,6 +5,10 @@ namespace Mindy\Template\Expression;
 use Mindy\Template\Compiler;
 use Mindy\Template\Expression;
 
+/**
+ * Class FilterExpression
+ * @package Mindy\Template
+ */
 class FilterExpression extends Expression
 {
     protected $node;

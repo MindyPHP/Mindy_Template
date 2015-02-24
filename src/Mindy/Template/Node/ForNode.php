@@ -5,6 +5,10 @@ namespace Mindy\Template\Node;
 use Mindy\Template\Compiler;
 use Mindy\Template\Node;
 
+/**
+ * Class ForNode
+ * @package Mindy\Template
+ */
 class ForNode extends Node
 {
     protected $seq;

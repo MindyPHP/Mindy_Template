@@ -5,6 +5,10 @@ namespace Mindy\Template\Expression;
 use Mindy\Template\Compiler;
 use Mindy\Template\Expression;
 
+/**
+ * Class UnaryExpression
+ * @package Mindy\Template
+ */
 class UnaryExpression extends Expression
 {
     protected $node;

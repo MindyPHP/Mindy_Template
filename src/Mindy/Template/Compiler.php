@@ -4,6 +4,10 @@ namespace Mindy\Template;
 
 use RuntimeException;
 
+/**
+ * Class Compiler
+ * @package Mindy\Template
+ */
 class Compiler
 {
     protected $fp;

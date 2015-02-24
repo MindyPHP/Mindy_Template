@@ -5,6 +5,10 @@ namespace Mindy\Template\Adapter;
 use Mindy\Template\Adapter;
 use RuntimeException;
 
+/**
+ * Class FileAdapter
+ * @package Mindy\Template
+ */
 class FileAdapter implements Adapter
 {
     protected $source;

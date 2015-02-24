@@ -2,6 +2,10 @@
 
 namespace Mindy\Template;
 
+/**
+ * Interface Adapter
+ * @package Mindy\Template
+ */
 interface Adapter
 {
     /**

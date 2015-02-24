@@ -4,6 +4,10 @@ namespace Mindy\Template;
 
 use Exception;
 
+/**
+ * Class SyntaxError
+ * @package Mindy\Template
+ */
 class SyntaxError extends Exception
 {
     protected $token;

@@ -6,6 +6,10 @@ use Mindy\Template\Compiler;
 use Mindy\Template\Node;
 use Mindy\Template\NodeList;
 
+/**
+ * Class SetNode
+ * @package Mindy\Template
+ */
 class SetNode extends Node
 {
     protected $name;

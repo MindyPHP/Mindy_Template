@@ -5,6 +5,10 @@ namespace Mindy\Template\Expression;
 use Mindy\Template\Compiler;
 use Mindy\Template\Expression;
 
+/**
+ * Class CompareExpression
+ * @package Mindy\Template
+ */
 class CompareExpression extends Expression
 {
     protected $expr;

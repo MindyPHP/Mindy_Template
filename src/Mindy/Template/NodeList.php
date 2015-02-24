@@ -2,6 +2,10 @@
 
 namespace Mindy\Template;
 
+/**
+ * Class NodeList
+ * @package Mindy\Template
+ */
 class NodeList extends Node
 {
     /**

@@ -6,6 +6,10 @@ use Countable;
 use Mindy\Template\Helper\RangeIterator;
 use Traversable;
 
+/**
+ * Class Helper
+ * @package Mindy\Template
+ */
 class Helper
 {
     static $encoding = 'UTF-8';

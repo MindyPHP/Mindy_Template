@@ -1,24 +1,15 @@
 <?php
-/**
- *
- *
- * All rights reserved.
- *
- * @author Falaleev Maxim
- * @email max@studio107.ru
- * @version 1.0
- * @company Studio107
- * @site http://studio107.ru
- * @date 01/08/14.08.2014 19:09
- */
 
 namespace Mindy\Template\Node;
-
 
 use Mindy\Template\Compiler;
 use Mindy\Template\Expression\ArrayExpression;
 use Mindy\Template\Node;
 
+/**
+ * Class UrlNode
+ * @package Mindy\Template
+ */
 class UrlNode extends Node
 {
     protected $route;

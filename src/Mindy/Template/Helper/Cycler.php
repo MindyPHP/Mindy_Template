@@ -5,6 +5,10 @@ namespace Mindy\Template\Helper;
 use ArrayIterator;
 use IteratorAggregate;
 
+/**
+ * Class Cycler
+ * @package Mindy\Template
+ */
 class Cycler implements IteratorAggregate
 {
     protected $elements;

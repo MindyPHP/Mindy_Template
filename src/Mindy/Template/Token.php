@@ -2,6 +2,10 @@
 
 namespace Mindy\Template;
 
+/**
+ * Class Token
+ * @package Mindy\Template
+ */
 class Token
 {
     protected $type;

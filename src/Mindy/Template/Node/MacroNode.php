@@ -5,6 +5,10 @@ namespace Mindy\Template\Node;
 use Mindy\Template\Compiler;
 use Mindy\Template\Node;
 
+/**
+ * Class MacroNode
+ * @package Mindy\Template
+ */
 class MacroNode extends Node
 {
     protected $name;

@@ -4,6 +4,10 @@ namespace Mindy\Template\Expression;
 
 use Mindy\Template\Compiler;
 
+/**
+ * Class AndExpression
+ * @package Mindy\Template
+ */
 class AndExpression extends LogicalExpression
 {
     public function compile(Compiler $compiler, $indent = 0)

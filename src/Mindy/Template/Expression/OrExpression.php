@@ -4,6 +4,10 @@ namespace Mindy\Template\Expression;
 
 use Mindy\Template\Compiler;
 
+/**
+ * Class OrExpression
+ * @package Mindy\Template
+ */
 class OrExpression extends LogicalExpression
 {
     public function compile(Compiler $compiler, $indent = 0)

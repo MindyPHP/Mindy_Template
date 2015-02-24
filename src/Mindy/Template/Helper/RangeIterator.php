@@ -4,6 +4,10 @@ namespace Mindy\Template\Helper;
 
 use Iterator;
 
+/**
+ * Class RangeIterator
+ * @package Mindy\Template
+ */
 class RangeIterator implements Iterator
 {
     protected $lower;

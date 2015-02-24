@@ -1,24 +1,16 @@
 <?php
-/**
- * 
- *
- * All rights reserved.
- * 
- * @author Falaleev Maxim
- * @email max@studio107.ru
- * @version 1.0
- * @company Studio107
- * @site http://studio107.ru
- * @date 03/08/14.08.2014 18:33
- */
 
 namespace Mindy\Template;
 
-
 use Mindy\Template\Expression\ArrayExpression;
 use Mindy\Template\Node\CsrfTokenNode;
+use Mindy\Template\Node\ImageNode;
 use Mindy\Template\Node\UrlNode;
 
+/**
+ * Class DefaultLibrary
+ * @package Mindy\Template
+ */
 class DefaultLibrary extends Library
 {
     /**
@@ -37,6 +29,7 @@ class DefaultLibrary extends Library
         return [
             'url' => 'parseUrl',
             'csrf_token' => 'parseCsrfToken',
+            'image' => 'parseImage',
         ];
     }
 
@@ -67,7 +60,7 @@ class DefaultLibrary extends Library
                 $name = $this->parser->parseName()->getValue();
             } else if ($this->stream->test(Token::NAME)) {
                 $expression = $this->parser->parseExpression();
-                if($expression instanceof ArrayExpression) {
+                if ($expression instanceof ArrayExpression) {
                     $params = $expression;
                     break;
                 } else {
@@ -80,5 +73,26 @@ class DefaultLibrary extends Library
 
         $this->stream->expect(Token::BLOCK_END);
         return new UrlNode($token->getLine(), $route, $params, $name);
+    }
+
+    public function parseImage($token)
+    {
+        $prefix = null;
+        $url = $this->parser->parseExpression();
+        while (
+            (
+                $this->stream->test(Token::NAME) ||
+                $this->stream->test(Token::STRING)
+            ) && !$this->stream->test(Token::BLOCK_END)
+        ) {
+            if ($this->stream->test(Token::NAME)) {
+                $prefix = $this->parser->parseExpression();
+            } else if ($this->stream->test(Token::STRING)) {
+                $prefix = $this->parser->parseExpression();
+            }
+        }
+
+        $this->stream->expect(Token::BLOCK_END);
+        return new ImageNode($token->getLine(), $url, $prefix);
     }
 }

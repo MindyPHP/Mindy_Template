@@ -4,6 +4,10 @@ namespace Mindy\Template;
 
 use Mindy\Template\Expression\FilterExpression;
 
+/**
+ * Class Parser
+ * @package Mindy\Template
+ */
 class Parser
 {
     /**
