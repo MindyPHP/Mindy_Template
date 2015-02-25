@@ -14,7 +14,7 @@ class Renderer extends Loader
     public function __construct(array $options = [])
     {
         if (!isset($options['target'])) {
-            $options['target'] = Alias::get('application.runtime.cache');
+            $options['target'] = Alias::get('application.runtime.cache_templates');
         }
         if (!isset($options['source'])) {
             $options['source'] = Mindy::app()->finder->getPaths();
