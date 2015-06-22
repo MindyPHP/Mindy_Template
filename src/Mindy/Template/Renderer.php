@@ -4,6 +4,7 @@ namespace Mindy\Template;
 
 use Mindy\Base\Mindy;
 use Mindy\Helper\Alias;
+use Mindy\Helper\Traits\Configurator;
 
 /**
  * Class Renderer
@@ -11,6 +12,8 @@ use Mindy\Helper\Alias;
  */
 class Renderer extends Loader
 {
+    use Configurator;
+
     /**
      * @var \Mindy\Finder\Finder
      */
