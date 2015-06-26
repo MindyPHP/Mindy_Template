@@ -17,20 +17,20 @@ class Lexer
     protected $end;
     protected $trim;
 
-    const BLOCK_START      = '{%';
-    const BLOCK_START_TRIM = '{%-';
-    const BLOCK_END        = '%}';
-    const BLOCK_END_TRIM   = '-%}';
+    const BLOCK_START      = '{%-';
+    const BLOCK_START_TRIM = '{%';
+    const BLOCK_END        = '-%}';
+    const BLOCK_END_TRIM   = '%}';
 
-    const COMMENT_START      = '{#';
-    const COMMENT_START_TRIM = '{#-';
-    const COMMENT_END        = '#}';
-    const COMMENT_END_TRIM   = '-#}';
+    const COMMENT_START      = '{#-';
+    const COMMENT_START_TRIM = '{#';
+    const COMMENT_END        = '-#}';
+    const COMMENT_END_TRIM   = '#}';
 
-    const OUTPUT_START      = '{{';
-    const OUTPUT_START_TRIM = '{{-';
-    const OUTPUT_END        = '}}';
-    const OUTPUT_END_TRIM   = '-}}';
+    const OUTPUT_START      = '{{-';
+    const OUTPUT_START_TRIM = '{{';
+    const OUTPUT_END        = '-}}';
+    const OUTPUT_END_TRIM   = '}}';
 
     const POSITION_TEXT  = 0;
     const POSITION_BLOCK = 1;
