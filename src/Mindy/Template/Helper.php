@@ -327,7 +327,7 @@ class Helper
 
     public static function toint($obj = null)
     {
-        return (int) $obj;
+        return (int)$obj;
     }
 
     public static function has_key($obj = null, $key)
@@ -338,5 +338,18 @@ class Helper
     public static function call($obj = null, $method, array $args = [])
     {
         return call_user_func_array([$obj, $method], $args);
+    }
+
+    public static function strict_type($obj = null)
+    {
+        if (is_numeric($obj) && mb_strlen($obj, self::$encoding)) {
+            return (bool)$obj;
+        } else if (is_numeric($obj)) {
+            return (int)$obj;
+        } else if (is_string($obj) && in_array((string)$obj, ['true', 'false'])) {
+            return (bool)$obj;
+        } else {
+            return (string)$obj;
+        }
     }
 }
