@@ -31,7 +31,7 @@ class Helper
 
     public static function startswith($obj = null, $needle)
     {
-        return mb_strpos((string)$obj, $needle, self::$encoding) === 0;
+        return mb_strpos((string)$obj, $needle, 0, self::$encoding) === 0;
     }
 
     public static function bytes($obj = null, $decimals = 1, $dec = '.', $sep = ',')
