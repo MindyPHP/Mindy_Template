@@ -30,7 +30,7 @@ class Module
         $compiler->raw("<?php\n");
         $moduleName = trim(preg_replace('/(\s\s+|[\n\r])/', ' ', $module));
         $compiler->raw(
-            '// ' . $moduleName . ' ' . gmdate('Y-m-d H:i:s T', time()) .
+            '// ' . md5($moduleName) . ' ' . gmdate('Y-m-d H:i:s T', time()) .
             "\n", $indent
         );
         $compiler->raw("\nuse \\Mindy\\Template\\Template;\n\n");
@@ -38,7 +38,7 @@ class Module
         $compiler->raw("{\n", $indent);
 
         $compiler->raw('const NAME = ', $indent + 1);
-        $compiler->repr($module);
+        $compiler->repr(md5($module));
         $compiler->raw(";\n\n");
 
         $compiler->raw(
@@ -113,6 +113,6 @@ class Module
         $compiler->raw($compiler->getTraceInfo(true) . ";\n");
 
         $compiler->raw("}\n");
-        $compiler->raw('// end of ' . $moduleName . "\n");
+        $compiler->raw('// end of ' . md5($moduleName) . "\n");
     }
 }
