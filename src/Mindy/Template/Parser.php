@@ -268,8 +268,8 @@ class Parser
                 );
             } elseif ($statement == 'unless') {
                 $node = new Node\IfNode(array(array(
-                        new Expression\NotExpression($test_expr, $token->getLine()), $node
-                    )), null, $token->getLine()
+                    new Expression\NotExpression($test_expr, $token->getLine()), $node
+                )), null, $token->getLine()
                 );
             }
         }
@@ -926,7 +926,7 @@ class Parser
         return new Expression\MacroExpression($module, $name, $args, $token->getLine());
     }
 
-    protected function parseArrayExpression()
+    public function parseArrayExpression()
     {
         $line = $this->stream->getCurrentToken()->getLine();
         $elements = array();
