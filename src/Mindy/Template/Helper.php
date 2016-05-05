@@ -340,6 +340,19 @@ class Helper
         return call_user_func_array([$obj, $method], $args);
     }
 
+    public static function merge($src = null, $dst = null)
+    {
+        if (!$src) {
+            $src = [];
+        }
+
+        if (!$dst) {
+            $dst = [];
+        }
+
+        return array_merge($src, $dst);
+    }
+
     public static function strict_type($obj = null)
     {
         if (is_numeric($obj) && mb_strlen($obj, self::$encoding)) {
