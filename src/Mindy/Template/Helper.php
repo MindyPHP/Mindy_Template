@@ -14,6 +14,15 @@ class Helper
 {
     static $encoding = 'UTF-8';
 
+    public static function explode($obj = null, $delimiter)
+    {
+        if ($obj === null) {
+            return [];
+        }
+
+        return explode($delimiter, $obj);
+    }
+
     public static function abs($obj = null)
     {
         return abs(intval($obj));
