@@ -17,6 +17,7 @@ namespace Mindy\Template;
 
 use Mindy\Template\Expression\ArrayExpression;
 use Mindy\Template\Node\CsrfTokenNode;
+use Mindy\Template\Node\ImageNode;
 use Mindy\Template\Node\UrlNode;
 
 class DefaultLibrary extends Library
@@ -35,9 +36,51 @@ class DefaultLibrary extends Library
     public function getTags()
     {
         return [
+            'image' => 'parseImage',
             'url' => 'parseUrl',
             'csrf_token' => 'parseCsrfToken',
         ];
+    }
+
+    public function parseImage($token)
+    {
+        $name = null;
+        $params = [];
+        $imageUrl = $this->parser->parseExpression();
+        while (
+            (
+                $this->stream->test(Token::NAME) ||
+                $this->stream->test(Token::NUMBER) ||
+                $this->stream->test(Token::STRING)
+            ) && !$this->stream->test(Token::BLOCK_END)
+        ) {
+
+            if ($this->stream->consume(Token::NAME, 'with')) {
+                $this->stream->expect(Token::OPERATOR, '[');
+                $params = $this->parser->parseArrayExpression();
+                $this->stream->expect(Token::OPERATOR, ']');
+            } else if ($this->stream->test(Token::NAME) && $this->stream->look()->test(Token::OPERATOR, '=')) {
+                $key = $this->parser->parseName()->getValue();
+                $this->stream->next();
+                $params[$key] = $this->parser->parseExpression();
+            } else if ($this->stream->test(Token::NAME, 'as')) {
+                $this->stream->next();
+                $name = $this->parser->parseName()->getValue();
+            } else if ($this->stream->test(Token::NAME)) {
+                $expression = $this->parser->parseExpression();
+                if ($expression instanceof ArrayExpression) {
+                    $params = $expression;
+                    break;
+                } else {
+                    $params[] = $expression;
+                }
+            } else {
+                $params[] = $this->parser->parseExpression();
+            }
+        }
+
+        $this->stream->expect(Token::BLOCK_END);
+        return new ImageNode($token->getLine(), $imageUrl, $params, $name);
     }
 
     public function parseCsrfToken($token)
