@@ -68,6 +68,15 @@ class Loader
             throw new RuntimeException('missing target directory');
         }
 
+        $target = $options['target'];
+        if ($target instanceof \Closure) {
+            $target = $target->__invoke();
+        }
+
+        $source = $options['source'];
+        if ($source instanceof \Closure) {
+            $source = $source->__invoke();
+        }
         $options += array(
             'mode' => self::RECOMPILE_NORMAL,
             'mkdir' => 0777,
@@ -76,22 +85,21 @@ class Loader
         );
 
         if (!isset($options['adapter'])) {
-            $options['adapter'] = new FileAdapter($options['source']);
+            $options['adapter'] = new FileAdapter($source);
         }
 
-        if (!is_dir($options['target'])) {
+        if (!is_dir($target)) {
             if ($options['mkdir'] === false) {
-                throw new RuntimeException(sprintf('target directory %s not found', $options['target']));
+                throw new RuntimeException(sprintf('target directory %s not found', $target));
             }
-            if (!mkdir($options['target'], $options['mkdir'], true)) {
-                throw new RuntimeException(sprintf('unable to create target directory %s', $options['target']));
+            if (!mkdir($target, $options['mkdir'], true)) {
+                throw new RuntimeException(sprintf('unable to create target directory %s', $target));
             }
         }
 
-        $source = $options['source'];
         $this->options = array(
             'source' => is_array($source) ? $source : [$source],
-            'target' => $options['target'],
+            'target' => $target,
             'mode' => $options['mode'],
             'adapter' => $options['adapter'],
             'helpers' => $options['helpers'],
