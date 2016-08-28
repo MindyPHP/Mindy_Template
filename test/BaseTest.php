@@ -5,6 +5,7 @@ namespace Mindy\Template\Tests;
 use Mindy\Template\Finder;
 use Mindy\Template\Finder\AppTemplateFinder;
 use Mindy\Template\Finder\TemplateFinder;
+use Mindy\Template\Finder\ThemeTemplateFinder;
 use Mindy\Template\Loader;
 use Mindy\Template\Renderer;
 
@@ -108,15 +109,42 @@ class BaseTest extends \PHPUnit_Framework_TestCase
 
     public function testRenderer()
     {
-        $finder = new Finder([
-            'finders' => [
-                new TemplateFinder(['basePath' => __DIR__]),
-                new AppTemplateFinder(['basePath' => __DIR__ . '/Modules']),
-            ]
-        ]);
-
         $renderer = new Renderer([
-            'source' => $finder->getPaths(),
+            'source' => function () {
+                $templates = [__DIR__ . '/templates'];
+                $modulesTemplates = glob(__DIR__ . '/Modules/*/templates');
+                $themesTemplates = glob(__DIR__ . '/themes/*/templates');
+
+                return array_merge($templates, $modulesTemplates, $themesTemplates);
+            },
+            'target' => __DIR__ . '/cache',
+            'mode' => Renderer::RECOMPILE_ALWAYS
+        ]);
+        $this->assertEquals('foobar', $renderer->render('example.html', ['data' => 'foobar']));
+        $this->assertEquals('foobar', $renderer->render('core/index.html', ['data' => 'foobar']));
+        $this->assertEquals('foobar', $renderer->renderString('{{ data }}', ['data' => 'foobar']));
+        $this->assertInstanceOf(Renderer::class, $renderer->compile('core/index.html', ['data' => 'foobar']));
+
+        $this->assertTrue($renderer->isValid('core/index.html', $error));
+    }
+
+    public function testRendererFinder()
+    {
+        $renderer = new Renderer([
+            'finder' => new Finder([
+                'finders' => [
+                    new TemplateFinder([
+                        'basePath' => __DIR__
+                    ]),
+                    new AppTemplateFinder([
+                        'basePath' => __DIR__ . '/Modules',
+                    ]),
+                    new ThemeTemplateFinder([
+                        'basePath' => __DIR__,
+                        'theme' => 'default'
+                    ])
+                ]
+            ]),
             'target' => __DIR__ . '/cache',
             'mode' => Renderer::RECOMPILE_ALWAYS
         ]);

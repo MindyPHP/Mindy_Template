@@ -40,7 +40,15 @@ class Loader
      * @var array
      */
     protected $libraries = array();
+    /**
+     * @var Finder
+     */
+    private $_finder;
 
+    /**
+     * Loader constructor.
+     * @param array $options
+     */
     public function __construct(array $options = [])
     {
         if (!isset($options['source'])) {
@@ -98,7 +106,7 @@ class Loader
     protected function handleSyntaxError($exception)
     {
         if ($this->exceptionHandler) {
-            $adapter = $this->options['adapter'];
+            $adapter = $this->getAdapter();
             echo $this->renderString(file_get_contents(__DIR__ . '/templates/debug.html'), [
                 'exception' => $exception,
                 'source' => $adapter->getContents($exception->getTemplateFile()),
@@ -126,6 +134,24 @@ class Loader
     }
 
     /**
+     * @return Finder
+     */
+    public function getFinder()
+    {
+        return $this->_finder;
+    }
+
+    public function setFinder($config)
+    {
+        if (is_object($config)) {
+            $this->_finder = $config;
+        } else {
+            $this->_finder = Creator::createObject($config);
+        }
+        return $this;
+    }
+
+    /**
      * @param $template
      * @param string $from
      * @return string
@@ -149,13 +175,21 @@ class Loader
         throw new RuntimeException(sprintf('Template %s not found', $template));
     }
 
+    /**
+     * @return Adapter\Adapter
+     */
+    protected function getAdapter()
+    {
+        return $this->options['adapter'];
+    }
+
     public function compile($template, $mode = null)
     {
         if (!is_string($template)) {
             throw new \InvalidArgumentException('string expected');
         }
 
-        $adapter = $this->options['adapter'];
+        $adapter = $this->getAdapter();
 
         $path = $this->resolvePath($template);
 
@@ -219,7 +253,7 @@ class Loader
             throw new InvalidArgumentException('string expected');
         }
 
-        $adapter = $this->options['adapter'];
+        $adapter = $this->getAdapter();
 
         if (isset($this->paths[$template . $from])) {
             $path = $this->paths[$template . $from];
@@ -317,7 +351,7 @@ class Loader
             throw new InvalidArgumentException('string expected');
         }
 
-        $adapter = $this->options['adapter'];
+        $adapter = $this->getAdapter();
         $path = $this->resolvePath($template);
 
         if (!$adapter->isReadable($path)) {

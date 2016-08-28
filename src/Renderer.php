@@ -10,5 +10,11 @@ namespace Mindy\Template;
  */
 class Renderer extends Loader
 {
-
+    public function __construct(array $options)
+    {
+        if (isset($options['finder'])) {
+            $options['source'] = $options['finder']->getPaths();
+        }
+        parent::__construct($options);
+    }
 }
