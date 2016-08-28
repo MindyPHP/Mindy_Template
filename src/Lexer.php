@@ -160,7 +160,7 @@ class Lexer
                 if (preg_match('/.*?(' .
                     preg_quote(self::COMMENT_END_TRIM) . '|' .
                     preg_quote(self::COMMENT_END) . ')/As',
-                    $this->source, $match, null, $this->cursor)
+                    $this->source, $match, 0, $this->cursor)
                 ) {
                     if ($match[1] == self::COMMENT_END_TRIM) {
                         $this->trim = true;
