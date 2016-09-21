@@ -26,7 +26,9 @@ abstract class Template
         'is_array',
         'number_format',
         'nl2br',
-        'substr_count'
+        'substr_count',
+        'dirname',
+        'basename'
     ];
     /**
      * @var Loader

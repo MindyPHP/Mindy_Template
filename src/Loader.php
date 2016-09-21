@@ -40,10 +40,6 @@ class Loader
      * @var array
      */
     protected $libraries = array();
-    /**
-     * @var Finder
-     */
-    private $_finder;
 
     /**
      * Loader constructor.
@@ -131,24 +127,6 @@ class Loader
             }
         }
         return $parts;
-    }
-
-    /**
-     * @return Finder
-     */
-    public function getFinder()
-    {
-        return $this->_finder;
-    }
-
-    public function setFinder($config)
-    {
-        if (is_object($config)) {
-            $this->_finder = $config;
-        } else {
-            $this->_finder = Creator::createObject($config);
-        }
-        return $this;
     }
 
     /**
