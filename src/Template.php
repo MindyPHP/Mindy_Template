@@ -24,11 +24,15 @@ abstract class Template
      */
     public $internalHelpers = [
         'is_array',
+        'is_object',
+        'is_string',
         'number_format',
         'nl2br',
         'substr_count',
         'dirname',
-        'basename'
+        'basename',
+        'time',
+        'strtotime'
     ];
     /**
      * @var Loader
