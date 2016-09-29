@@ -14,6 +14,15 @@ class Helper
 {
     static $encoding = 'UTF-8';
 
+    public static function method_exists($obj = null, $method)
+    {
+        if ($obj === null) {
+            return false;
+        }
+        
+        return method_exists($obj, $method);
+    }
+
     public static function implode($obj = null, $glue)
     {
         if ($obj === null) {
