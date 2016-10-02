@@ -68,6 +68,7 @@ class Loader
             'mode' => self::RECOMPILE_NORMAL,
             'mkdir' => 0777,
             'helpers' => array(),
+            'globals' => array(),
             'autoEscape' => true
         );
 
@@ -90,6 +91,7 @@ class Loader
             'mode' => $options['mode'],
             'adapter' => $options['adapter'],
             'helpers' => $options['helpers'],
+            'globals' => $options['globals'],
             'autoEscape' => $options['autoEscape'],
         );
 

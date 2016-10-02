@@ -3,7 +3,7 @@
 declare(strict_types = 1);
 
 namespace Mindy\Template;
-use function Mindy\app;
+use Mindy\Finder\Finder;
 
 /**
  * Class Renderer
@@ -11,11 +11,13 @@ use function Mindy\app;
  */
 class Renderer extends Loader
 {
-    public function __construct(array $options)
+    /**
+     * Renderer constructor.
+     * @param Finder $finder
+     * @param array $options
+     */
+    public function __construct(Finder $finder, array $options = [])
     {
-        if (!isset($options['source'])) {
-            $options['source'] = app()->finder->getPaths();
-        }
-        parent::__construct($options);
+        parent::__construct(array_merge($options, ['source' => $finder->getPaths()]));
     }
 }

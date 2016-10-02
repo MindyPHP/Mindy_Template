@@ -225,7 +225,7 @@ abstract class Template
     public function render($context = array(), $blocks = array(), $macros = array(), $imports = array())
     {
         ob_start();
-        $this->display($context, $blocks, $macros);
+        $this->display($context, $blocks, $macros, $imports);
         return ob_get_clean();
     }
 
@@ -338,11 +338,6 @@ abstract class Template
             }
             $this->setAttr($obj[$attr], $attrs, $value);
         }
-    }
-
-    public static function toint($obj = null, $value)
-    {
-        return (int)$value;
     }
 }
 
