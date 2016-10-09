@@ -62,11 +62,22 @@ abstract class Template
      * @var array
      */
     protected $stack;
+    /**
+     * @var array|VariableProviderInterface[]
+     */
+    protected $variableProviders = array();
 
-    public function __construct(Loader $loader, $helpers = array())
+    /**
+     * Template constructor.
+     * @param Loader $loader
+     * @param array $helpers
+     * @param array|VariableProviderInterface[] $variablesProviders
+     */
+    public function __construct(Loader $loader, $helpers = array(), $variablesProviders = array())
     {
         $this->loader = $loader;
         $this->helpers = $helpers;
+        $this->variableProviders = $variablesProviders;
         $this->parent = null;
         $this->blocks = array();
         $this->macros = array();
@@ -225,8 +236,20 @@ abstract class Template
     public function render($context = array(), $blocks = array(), $macros = array(), $imports = array())
     {
         ob_start();
-        $this->display($context, $blocks, $macros, $imports);
+        $this->display($this->mergeContext($context), $blocks, $macros, $imports);
         return ob_get_clean();
+    }
+
+    /**
+     * @param array $context
+     * @return array
+     */
+    protected function mergeContext($context = array())
+    {
+        foreach ($this->variableProviders as $variableProvider) {
+            $context = array_merge($context, $variableProvider->getData());
+        }
+        return $context;
     }
 
     public function iterate($context, $seq)

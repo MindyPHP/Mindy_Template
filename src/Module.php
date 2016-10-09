@@ -20,9 +20,9 @@ class Module
     {
         $this->extends = $extends;
         $this->imports = $imports;
-        $this->blocks  = $blocks;
-        $this->macros  = $macros;
-        $this->body    = $body;
+        $this->blocks = $blocks;
+        $this->macros = $macros;
+        $this->body = $body;
     }
 
     public function compile($module, $compiler, $indent = 0)
@@ -44,12 +44,12 @@ class Module
         $compiler->raw(";\n\n");
 
         $compiler->raw(
-            'public function __construct($loader, $helpers = array())' . "\n",
+            'public function __construct($loader, $helpers = array(), $variablesProviders = array())' . "\n",
             $indent + 1
         );
         $compiler->raw("{\n", $indent + 1);
         $compiler->raw(
-            'parent::__construct($loader, $helpers);' . "\n",
+            'parent::__construct($loader, $helpers, $variablesProviders);' . "\n",
             $indent + 2
         );
 

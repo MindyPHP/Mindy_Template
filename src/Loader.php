@@ -29,6 +29,10 @@ class Loader
      */
     protected $options = array();
     /**
+     * @var array|VariableProviderInterface[]
+     */
+    protected $variableProviders = array();
+    /**
      * @var array
      */
     protected $paths = array();
@@ -101,6 +105,17 @@ class Loader
         $this->addLibrary(new DefaultLibrary);
     }
 
+    /**
+     * @param VariableProviderInterface $variableProvider
+     */
+    public function addVariableProvider(VariableProviderInterface $variableProvider)
+    {
+        $this->variableProviders[] = $variableProvider;
+    }
+
+    /**
+     * @param $exception
+     */
     protected function handleSyntaxError($exception)
     {
         if ($this->exceptionHandler) {
@@ -285,7 +300,7 @@ class Loader
             require_once $target;
         }
 
-        return $this->cache[$class] = new $class($this, $this->options['helpers']);
+        return $this->cache[$class] = new $class($this, $this->options['helpers'], $this->variableProviders);
     }
 
     /**
@@ -322,7 +337,7 @@ class Loader
         }
         require_once $target;
 
-        return $this->cache[$class] = new $class($this, $this->options['helpers']);
+        return $this->cache[$class] = new $class($this, $this->options['helpers'], $this->variableProviders);
     }
 
     public function isValid($template, &$error = null)
@@ -373,12 +388,21 @@ class Loader
         return $this->loadFromString($source)->render($data);
     }
 
+    /**
+     * @param $name
+     * @param $func
+     * @return $this
+     */
     public function addHelper($name, $func)
     {
         $this->options['helpers'][$name] = $func;
         return $this;
     }
 
+    /**
+     * @param Library $library
+     * @return $this
+     */
     public function addLibrary(Library $library)
     {
         $this->libraries[] = $library;
