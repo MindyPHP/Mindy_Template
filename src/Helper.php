@@ -19,7 +19,7 @@ class Helper
         if ($obj === null) {
             return false;
         }
-        
+
         return method_exists($obj, $method);
     }
 
@@ -58,7 +58,12 @@ class Helper
 
     public static function startswith($obj = null, $needle)
     {
-        return mb_strpos((string)$obj, $needle, 0, self::$encoding) === 0;
+        return mb_strpos((string) $obj, $needle, 0, self::$encoding) === 0;
+    }
+
+    public static function contains($obj = null, $needle)
+    {
+        return mb_strpos((string) $obj, $needle, 0, self::$encoding) !== false;
     }
 
     public static function bytes($obj = null, $decimals = 1, $dec = '.', $sep = ',')
@@ -79,14 +84,14 @@ class Helper
 
     public static function capitalize($obj)
     {
-        $str = (string)$obj;
+        $str = (string) $obj;
         return mb_strtoupper(mb_substr($str, 0, 1, self::$encoding), self::$encoding) . mb_strtolower(mb_substr($str, 1, mb_strlen($str), self::$encoding), self::$encoding);
     }
 
     public static function cycle($obj = null)
     {
-        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array)$obj;
-        return new Helper\Cycler((array)$obj);
+        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array) $obj;
+        return new Helper\Cycler((array) $obj);
     }
 
     public static function time($obj = null)
@@ -104,7 +109,7 @@ class Helper
 
     public static function strtotime($obj = null)
     {
-        return (string)$obj;
+        return (string) $obj;
     }
 
     public static function dump($obj = null)
@@ -121,7 +126,7 @@ class Helper
 
     public static function escape($obj = null, $force = false)
     {
-        return htmlspecialchars((string)$obj, ENT_QUOTES, self::$encoding, $force);
+        return htmlspecialchars((string) $obj, ENT_QUOTES, self::$encoding, $force);
     }
 
     public static function first($obj = null, $default = null)
@@ -129,7 +134,7 @@ class Helper
         if (is_string($obj)) {
             return strlen($obj) ? substr($obj, 0, 1) : $default;
         }
-        $obj = $obj instanceof Traversable ? iterator_to_array($obj) : (array)$obj;
+        $obj = $obj instanceof Traversable ? iterator_to_array($obj) : (array) $obj;
         $keys = array_keys($obj);
         if (count($keys)) {
             return $obj[$keys[0]];
@@ -203,7 +208,7 @@ class Helper
 
     public static function join($obj = null, $glue = '')
     {
-        return join($glue, ($obj instanceof Traversable) ? iterator_to_array($obj) : (array)$obj);
+        return join($glue, ($obj instanceof Traversable) ? iterator_to_array($obj) : (array) $obj);
     }
 
     public static function json_encode($obj = null)
@@ -226,7 +231,7 @@ class Helper
         if (is_string($obj)) {
             return strlen($obj) ? substr($obj, -1) : $default;
         }
-        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array)$obj;
+        $obj = ($obj instanceof Traversable) ? iterator_to_array($obj) : (array) $obj;
         $keys = array_keys($obj);
         if ($len = count($keys)) {
             return $obj[$keys[$len - 1]];
@@ -237,7 +242,7 @@ class Helper
     public static function length($obj = null)
     {
         if (is_string($obj)) {
-            return mb_strlen((string)$obj, self::$encoding);
+            return mb_strlen((string) $obj, self::$encoding);
         } elseif (is_array($obj) || ($obj instanceof Countable)) {
             return count($obj);
         } elseif ($obj instanceof Traversable) {
@@ -254,12 +259,12 @@ class Helper
 
     public static function lower($obj = null)
     {
-        return mb_strtolower((string)$obj, self::$encoding);
+        return mb_strtolower((string) $obj, self::$encoding);
     }
 
     public static function nl2br($obj = null, $is_xhtml = false)
     {
-        return nl2br((string)$obj, $is_xhtml);
+        return nl2br((string) $obj, $is_xhtml);
     }
 
     public static function range($lower = null, $upper = null, $step = 1)
@@ -269,41 +274,41 @@ class Helper
 
     public static function repeat($obj, $times = 2)
     {
-        return str_repeat((string)$obj, $times);
+        return str_repeat((string) $obj, $times);
     }
 
     public static function replace($obj = null, $search = '', $replace = '', $regex = false)
     {
         if ($regex) {
-            return preg_replace($search, $replace, (string)$obj);
+            return preg_replace($search, $replace, (string) $obj);
         } else {
-            return str_replace($search, $replace, (string)$obj);
+            return str_replace($search, $replace, (string) $obj);
         }
     }
 
     public static function strip_tags($obj = null, $allowableTags = '')
     {
-        return strip_tags((string)$obj, $allowableTags);
+        return strip_tags((string) $obj, $allowableTags);
     }
 
     public static function title($obj = null)
     {
-        return ucwords((string)$obj);
+        return ucwords((string) $obj);
     }
 
     public static function trim($obj = null, $charlist = " \t\n\r\0\x0B")
     {
-        return trim((string)$obj, $charlist);
+        return trim((string) $obj, $charlist);
     }
 
     public static function striptags($obj = null, $allowable_tags = null)
     {
-        return strip_tags((string)$obj, $allowable_tags);
+        return strip_tags((string) $obj, $allowable_tags);
     }
 
     public static function truncate($obj = null, $length = 255, $preserve_words = false, $hellip = '&hellip;')
     {
-        $obj = (string)$obj;
+        $obj = (string) $obj;
         $len = mb_strlen($obj, self::$encoding);
 
         if ($length >= $len) {
@@ -316,7 +321,7 @@ class Helper
 
     public static function unescape($obj = null)
     {
-        return htmlspecialchars_decode((string)$obj, ENT_QUOTES);
+        return htmlspecialchars_decode((string) $obj, ENT_QUOTES);
     }
 
     public static function chunk($obj = null, $by)
@@ -326,17 +331,17 @@ class Helper
 
     public static function upper($obj = null)
     {
-        return mb_strtoupper((string)$obj, self::$encoding);
+        return mb_strtoupper((string) $obj, self::$encoding);
     }
 
     public static function url_encode($obj = null)
     {
-        return urlencode((string)$obj);
+        return urlencode((string) $obj);
     }
 
     public static function word_wrap($obj = null, $width = 75, $break = "\n", $cut = false)
     {
-        return wordwrap((string)$obj, $width, $break, $cut);
+        return wordwrap((string) $obj, $width, $break, $cut);
     }
 
     public static function round($obj = null, $precision = 0, $type = 'common')
@@ -354,12 +359,12 @@ class Helper
 
     public static function toint($obj = null)
     {
-        return (int)$obj;
+        return (int) $obj;
     }
 
     public static function has_key($obj = null, $key)
     {
-        return array_key_exists($key, (array)$obj);
+        return array_key_exists($key, (array) $obj);
     }
 
     public static function call($obj = null, $method, array $args = [])
@@ -383,13 +388,13 @@ class Helper
     public static function strict_type($obj = null)
     {
         if (is_numeric($obj) && mb_strlen($obj, self::$encoding)) {
-            return (bool)$obj;
+            return (bool) $obj;
         } else if (is_numeric($obj)) {
-            return (int)$obj;
-        } else if (is_string($obj) && in_array((string)$obj, ['true', 'false'])) {
-            return (bool)$obj;
+            return (int) $obj;
+        } else if (is_string($obj) && in_array((string) $obj, ['true', 'false'])) {
+            return (bool) $obj;
         } else {
-            return (string)$obj;
+            return (string) $obj;
         }
     }
 }
